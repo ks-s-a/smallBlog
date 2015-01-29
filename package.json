@@ -1,0 +1,26 @@
+{
+  "name": "myapp",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ks-s-a/smallBlog.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ks-s-a/smallBlog/issues"
+  },
+  "homepage": "https://github.com/ks-s-a/smallBlog",
+  "dependencies": {
+    "koa": "^0.16.0",
+    "pg": "^4.2.0",
+    "pg-hstore": "^2.3.1",
+    "sequelize": "^2.0.0-rc8"
+  }
+}
