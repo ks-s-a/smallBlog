@@ -1,7 +1,8 @@
+const config = require('./config');
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize('neo', 'neo', '', {
-  dialect: 'postgres',
+const sequelize = new Sequelize(config.database, config.username, config.password, {
+  dialect: config.dialect,
 
   pool: {
     maxConnections: 50,
@@ -11,25 +12,35 @@ const sequelize = new Sequelize('neo', 'neo', '', {
 
 });
 
-var User = sequelize.define('user', {
-  firstName: {
-    type: Sequelize.STRING,
-    field: 'first_name' // Will result in an attribute that is firstName when user facing but first_name in the database
+var User = sequelize.define('article', {
+  id: {
+    allowNull: false,
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
-  lastName: {
-    type: Sequelize.STRING
-  }
+  header: {
+    allowNull: false,
+    type: Sequelize.STRING,
+    unique: false,
+  },
+  text: {
+    allowNull: false,
+    type: Sequelize.TEXT,
+  },
 }, {
   freezeTableName: true // Model tableName will be the same as the model name
 });
 
-User.sync({force: true}).then(function () {
-  // Table created
-  return User.create({
-    firstName: 'John',
-    lastName: 'Hancock'
+User.sync({force: true}) // TODO: Delete force property when realise app.
+  .then(function () {
+    // Table created
+    return User.create({
+      header: 'Trulala',
+      text: 'lkdsjfg lkjsdlkfgj lksdjfg kldskfgj sgjiotrej iw howj ggog sjtiogj joig soidjfg.'
+    });
+  })
+  .catch(function(reason){
+    // failure!
+    console.log('Model creation failed! Reason is: ', reason);
   });
-}).catch(function(reason){
-  // failure!
-  console.log('reason is: ', reason);
-});;
