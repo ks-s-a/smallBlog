@@ -1,12 +1,13 @@
-const db = require('./server/db/index.js');
-const koa = require('koa');
+const db = require('./server/db/index.js'),
+  jade = require('koa-jade'),
+  koa = require('koa');
 
 const app = koa();
 
 
 console.log('db successefully created!');
 
-app.use(function *(next) {
+app.use(function *checkTime(next) {
   var start = new Date();
 
   yield next;
@@ -17,12 +18,25 @@ app.use(function *(next) {
 
 app.use(require('koa-static')('./client'));
 
+app.use(jade.middleware({
+  debug: false,
+  noCache: true,
+  viewPath: __dirname + '/server/views',
+}));
+
 app.use(function *articlesGetter(next) {
 
-  this.state.posts = yield db.Article.findAll({
+  var rows = yield db.Article.findAll({
     limit: 3,
     order: [['id', 'DESC']],
   });
+
+  this.state.posts = rows.map(function(v) {
+    return {
+      id: v.dataValues.id,
+      header: v.dataValues.header,
+      text: v.dataValues.text,
+    }})
 
   yield next;
 
@@ -31,7 +45,9 @@ app.use(function *articlesGetter(next) {
 app.use(function *() {
   var self = this;
 
-  this.body = '';
+  yield this.render('index', {posts: this.state.posts});
+
+  /*this.body = '';
 
   if (this.state.posts) {
     this.state.posts.forEach(function(v) {
@@ -40,7 +56,7 @@ app.use(function *() {
   }
 
   else
-    this.body += 'Nothing to show!'
+    this.body += 'Nothing to show!'*/
 });
 
 app.on('error', function(err, ctx) {
