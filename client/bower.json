@@ -1,0 +1,21 @@
+{
+  "name": "smallBlog",
+  "main": "index.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/ks-s-a/smallBlog",
+  "authors": [
+    "s.ksenofontov <s.ksenofontov@sup.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "react": "~0.12.2",
+    "bootstrap": "~3.3.2"
+  }
+}
