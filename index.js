@@ -4,7 +4,6 @@ const db = require('./server/db/index.js'),
 
 const app = koa();
 
-
 console.log('db successefully created!');
 
 app.use(function *checkTime(next) {

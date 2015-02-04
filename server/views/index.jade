@@ -1,5 +1,8 @@
 head
   link(href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.2/readable/bootstrap.min.css", rel="stylesheet")
+  link(href="/css/main.css", rel="stylesheet")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/react.min.js")
+  script(src="https://cdnjs.cloudflare.com/ajax/libs/react/0.12.2/JSXTransformer.js")
   script(src="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js")
 
 body
@@ -23,40 +26,6 @@ body
 
     div(id="content-container")
 
-      // TODO: created dropdown list-group for mobile users uses react.js !!!
-      div(id="mobile-list" class="hidden-lg hidden-md hidden-sm col-xs-12")
-        button(class="btn btn-block btn-primary" type="button" data-toggle="collapse" data-target="#mobile-list-tags" aria-expanded="false" aria-controls="mobile-list-tags")='Выбрать тему'
-
-        div(class="collapse" id="mobile-list-tags")
-          ul(class="list-group")
-            li(class="list-group-item")
-              a(href="#")='Love '
-                span(class="badge")='42'
-            li(class="list-group-item")
-              a(href="#")='Date '
-                span(class="badge")='17'
-
-      div(id="side-buttons" class="col-lg-2 col-md-2 col-sm-2 hidden-xs")
-        div(class="big-logo-container" style="height=100px;width=100px;")
-
-        ul(class="nav nav-pills nav-stacked")
-          li
-            a(href="#")='Love '
-              span(class="badge") 42
-          li
-            a(href="#")='Date '
-              span(class="badge") 17
-
-      div(id="stories-container" class="col-lg-10 col-md-10 col-sm-10 col-xs-12")
-        div(id="heading" class="col-lg-12 col-md-12 col-sm-12 hidden-xs")
-          h1 Hello new pretty world!
-          br
-
-        each val in posts
-          div(class="posts")
-            h4= val.header
-            p(class="text-muted") tratata
-            p= val.text
-            br
-
   div(class="col-lg-2 col-md-1 hidden-sm hidden-xs")
+
+  script(src="/js/components.js", type="text/jsx")
