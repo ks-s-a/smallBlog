@@ -58,6 +58,26 @@ Article.sync({force: true}) // TODO: Delete force property when realise app.
       header: 'Lololo',
       text: 'j3i45glwigiljliej5gijsilej ilegilj5gi jseil5j giselj lig5 sleig5isei ljgijs jrlgji sji .'
     });
+
+    Article.create({
+      header: 'Trulala',
+      text: 'lkdsjfg lkjsdlkfgj lksdjfg kldskfgj sgjiotrej iw howj ggog sjtiogj joig soidjfg.'
+    });
+
+    Article.create({
+      header: 'Tratata',
+      text: 'ij3iojifilsdrilgjelsj glsij ligj lsdfjg ij5il jlisj glisej gliej li gjslig jilser jg.'
+    });
+
+    Article.create({
+      header: 'Proror',
+      text: 'orjgiji345ljglw4ijg5j wilgj il45g ls gj i5ji jj gs jgiljsliergjlsie5j. ывопращкоепшщ окщшео щопщшк оешщокщ ещшквщш ковщ еопкещ щвошщо в .в д одюв .н .внш.в ш.нвшошнодившоишд.вши.швшнвоншиондшо ищецшошошкено кшнеорш вон.и вн .ивш.нишвонившеоинов.. вн.'
+    });
+
+    Article.create({
+      header: 'Lololo',
+      text: 'j3i45glwigiljliej5gijsilej ilegilj5gi jseil5j giselj lig5 sleig5isei ljgijs jrlgji sji .'
+    });
   })
   .catch(function(reason){
     // failure!

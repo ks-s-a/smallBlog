@@ -27,7 +27,7 @@ app.use(jade.middleware({
 app.use(function *articlesGetter(next) {
 
   var rows = yield db.Article.findAll({
-    limit: 3,
+    //limit: 3,
     order: [['id', 'DESC']],
   });
 
