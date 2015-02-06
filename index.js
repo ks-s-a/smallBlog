@@ -1,65 +1,37 @@
 const db = require('./server/db/index.js'),
-  jade = require('koa-jade'),
-  koa = require('koa');
-
-const app = koa();
+  app = require('./server/lib/app'),
+  jade = require('jade');
 
 console.log('db successefully created!');
 
-app.use(function *checkTime(next) {
-  var start = new Date();
-
-  yield next;
-
-  var ms = new Date - start;
-  console.log('%s %s - %s', this.method, this.url, ms);
-});
-
-app.use(require('koa-static')('./client'));
-
-app.use(jade.middleware({
-  debug: false,
-  noCache: true,
-  viewPath: __dirname + '/server/views',
-}));
-
-app.use(function *articlesGetter(next) {
+articlesGetter = function *() {
 
   var rows = yield db.Article.findAll({
     //limit: 3,
     order: [['id', 'DESC']],
   });
 
-  this.state.posts = rows.map(function(v) {
+  return rows.map(function(v) {
     return {
       id: v.dataValues.id,
       header: v.dataValues.header,
       text: v.dataValues.text,
     }})
+};
 
-  yield next;
+app
+  .get('/getStories', function *() {
 
-});
+    this.status = 200;
+    this.body = JSON.stringify( yield articlesGetter );
 
-app.use(function *() {
-  var self = this;
+  })
 
-  yield this.render('index', {posts: this.state.posts});
+  .get('/', function *() {
 
-  /*this.body = '';
+    var compile = jade.compileFile('./server/views/index.jade');
+    this.body = compile();
 
-  if (this.state.posts) {
-    this.state.posts.forEach(function(v) {
-      self.body += 'id: ' + v.dataValues.id + ', header: ' + v.dataValues.header + ', text: ' + v.dataValues.text + '\n';
-    });
-  }
-
-  else
-    this.body += 'Nothing to show!'*/
-});
-
-app.on('error', function(err, ctx) {
-  console.log('Error is occured: ', err);
-})
+  });
 
 app.listen(3000);

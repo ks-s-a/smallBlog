@@ -7,7 +7,7 @@ gulp.task('default', ['convert:css'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
-    ext: 'html js',
+    ext: 'html js styl jade',
     ignore: ['ignored.js'],
   })
     .on('change', ['convert:css'])
@@ -17,8 +17,8 @@ gulp.task('default', ['convert:css'], function () {
 });
 
 gulp.task('convert:css', function(cb) {
-  gulp.src(['./complie/css/*.styl'])
-      .pipe(styl( inline() )
+  gulp.src(['./compile/css/*.styl'])
+      .pipe(styl( inline() ))
       .pipe(gulp.dest('./client/css'));
 
   console.log('converting processing!');

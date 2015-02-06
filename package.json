@@ -18,8 +18,9 @@
   },
   "homepage": "https://github.com/ks-s-a/smallBlog",
   "dependencies": {
+    "jade": "^1.9.1",
     "koa": "^0.16.0",
-    "koa-jade": "^0.3.1",
+    "koa-router": "^3.8.0",
     "koa-static": "^1.4.9",
     "pg": "^4.2.0",
     "pg-hstore": "^2.3.1",
