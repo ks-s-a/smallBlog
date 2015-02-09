@@ -8,7 +8,7 @@ var Container = React.createClass({
     };
 
     return (
-      <div>
+      <div id="content-container">
         <TagList tags={tagsObject} />
         <Stories tags={tagsObject} />
       </div>
@@ -51,10 +51,20 @@ var TagButton = React.createClass({
 var Stories = React.createClass({
 
   getStoriesFromServer: function(startIndex) {
+    var self = this;
     var tags = this.props.tags || [];
     var startIndexString = startIndex ? '&start=' + startIndex : ''
 
     var request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+      if (this.readyState != 4) return; // запрос ещё не завершён
+
+      if (this.responseText)
+        self.setState({
+          stories: JSON.parse(this.responseText),
+        });
+    }
 
     request.open('GET', '/getStories?tags=' + JSON.stringify(tags) + startIndexString, true);
 
@@ -62,21 +72,26 @@ var Stories = React.createClass({
   },
 
   getInitialState: function() {
-
+    // Let's create ajax-query for our stories...
     this.getStoriesFromServer();
 
-    return null;
+    return {
+      stories: [],
+    };
   },
 
   render: function() {
-    var stories = <Story />;
+    var storiesElements = this.state.stories.map(function(v) {
+      return <Story id={v.id} header={v.header} text={v.text} />
+    });
 
     return (<div id="stories-container" className="col-lg-10 col-md-10 col-sm-10 col-xs-12">
         <div id="heading" className="col-lg-12 col-md-12 col-sm-12 hidden-xs">
-          <h1>Hello new pretty world!</h1>
-          <br />
+          <div id="main-header">
+            <h1>Hello new pretty world!</h1>
+          </div>
 
-          {stories}
+          {storiesElements}
         </div>
       </div>);
   }
@@ -84,7 +99,14 @@ var Stories = React.createClass({
 
 var Story = React.createClass({
   render: function() {
-    return (<div></div>);
+    return (
+      <div className="posts">
+        <h4> {this.props.header} </h4>
+        <p className="text-muted"> Some tags there. </p>
+        <p> {this.props.text} </p>
+        <br />
+      </div>
+    );
   }
 });
 
