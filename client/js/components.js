@@ -1,51 +1,70 @@
 // Craeting React components
 
 var Container = React.createClass({
-  render: function () {
-    var tagsObject = {
-      1: 'Love',
-      2: 'Date'
+  getInitialState: function() {
+    return {
+      tagNames: {
+        1: 'Love',
+        2: 'Date',
+      },
+      tags: [],
     };
+  },
 
+  changeTags: function(arr) {
+    this.setState({tags: arr});
+  },
+
+  render: function () {
     return (
       <div id="content-container">
-        <TagList tags={tagsObject} />
-        <Stories tags={tagsObject} />
+        <TagList tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags.bind(null)} />
+        <Stories tags={this.state.tagNames} />
       </div>
     );
-  }
+  },
 });
 
 var TagList = React.createClass({
-  getInitialState: function() {
-    var tags = [];
+  chooseTag: function(tagIndex) {
+    var newTagArr = this.props.tags.slice();
+    var arrIndex = newTagArr.indexOf(tagIndex);
 
-    for (var tagIndex in this.props.tags)
-      tags.push(<TagButton name={this.props.tags[tagIndex]} index={tagIndex} count="42" />);
+    if (arrIndex === -1) {
+      newTagArr.push(tagIndex);
+    } else {
+      newTagArr.splice(arrIndex, 1);
+    }
 
-    return {tags: tags};
+    this.props.changeTagsFunction(newTagArr);
   },
 
   render: function() {
+    var tagElements = [];
+
+    for (var i in this.props.tagNames)
+      tagElements.push(<TagButton name={this.props.tagNames[i]} state={this.props.tags.indexOf(+i) !== -1} key={i} index={i} chooseTag={this.chooseTag.bind(null)} count="42" />);
+
+    console.log('this.props.tags is: ', this.props.tags);
 
     return (<div id="side-buttons" className="col-lg-2 col-md-2 col-sm-2 hidden-xs">
         <div className="big-logo-container" />
 
         <ul className="nav nav-pills nav-stacked">
-          {this.state.tags}
+          {tagElements}
         </ul>
       </div>);
-  }
+  },
 });
 
 var TagButton = React.createClass({
   render: function() {
-    return (<li>
-        <a href="#">
+    return (<li className={this.props.state ? 'active' : ''} key={this.props.key} >
+        <a href="#" onClick={this.props.chooseTag.bind(null, +this.props.index)}>
           {this.props.name} <span className="badge">{this.props.count}</span>
         </a>
       </li>);
-  }
+  },
 });
 
 var Stories = React.createClass({
@@ -82,7 +101,7 @@ var Stories = React.createClass({
 
   render: function() {
     var storiesElements = this.state.stories.map(function(v) {
-      return <Story id={v.id} header={v.header} text={v.text} />
+      return <Story key={v.id} header={v.header} text={v.text} />
     });
 
     return (<div id="stories-container" className="col-lg-10 col-md-10 col-sm-10 col-xs-12">
@@ -100,7 +119,7 @@ var Stories = React.createClass({
 var Story = React.createClass({
   render: function() {
     return (
-      <div className="posts">
+      <div className="posts" key={this.props.key}>
         <h4> {this.props.header} </h4>
         <p className="text-muted"> Some tags there. </p>
         <p> {this.props.text} </p>
@@ -110,4 +129,4 @@ var Story = React.createClass({
   }
 });
 
-React.renderComponent(<Container />, document.getElementById('content-container'));
+React.render(<Container />, document.getElementById('content-container'));
