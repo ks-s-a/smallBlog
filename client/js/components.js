@@ -1,4 +1,4 @@
-// Craeting React components
+// Creating React components
 
 var Container = React.createClass({
   getInitialState: function() {
@@ -8,7 +8,34 @@ var Container = React.createClass({
         2: 'Date',
       },
       tags: [],
+      tagNum: [],
     };
+  },
+
+  getArticleCount: function(tags) {
+    var self = this;
+
+    var request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+      if (this.readyState != 4) return; // Query is not competed
+
+      if (this.responseText) {
+        var response = JSON.parse(this.responseText);
+
+        console.log('self.tagNum is: ', self.tagNum);
+        console.log('response is: ', response);
+
+        if (!self.tagNum || self.tagNum.length !== response.length) {
+          self.setState({
+            tagNum: response,
+          });
+        }
+      }
+    }
+
+    request.open('GET', '/getStoriesNumber?tags=' + JSON.stringify(this.state.tags), true);
+    request.send();
   },
 
   changeTags: function(arr) {
@@ -16,10 +43,12 @@ var Container = React.createClass({
   },
 
   render: function () {
+    this.getArticleCount(this.state.tags);
+
     return (
       <div id="content-container">
-        <TagList tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags.bind(null)} />
-        <Stories tags={this.state.tagNames} />
+        <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagCount={this.state.tagCount} changeTagsFunction={this.changeTags.bind(null)} />
+        <Stories tagNames={this.state.tagNames} tags={this.state.tags} />
       </div>
     );
   },
@@ -45,8 +74,6 @@ var TagList = React.createClass({
     for (var i in this.props.tagNames)
       tagElements.push(<TagButton name={this.props.tagNames[i]} state={this.props.tags.indexOf(+i) !== -1} key={i} index={i} chooseTag={this.chooseTag.bind(null)} count="42" />);
 
-    console.log('this.props.tags is: ', this.props.tags);
-
     return (<div id="side-buttons" className="col-lg-2 col-md-2 col-sm-2 hidden-xs">
         <div className="big-logo-container" />
 
@@ -71,7 +98,6 @@ var Stories = React.createClass({
 
   getStoriesFromServer: function(startIndex) {
     var self = this;
-    var tags = this.props.tags || [];
     var startIndexString = startIndex ? '&start=' + startIndex : ''
 
     var request = new XMLHttpRequest();
@@ -85,22 +111,32 @@ var Stories = React.createClass({
         });
     }
 
-    request.open('GET', '/getStories?tags=' + JSON.stringify(tags) + startIndexString, true);
-
+    request.open('GET', '/getStories?tags=' + JSON.stringify(this.props.tags) + startIndexString, true);
     request.send();
   },
 
   getInitialState: function() {
-    // Let's create ajax-query for our stories...
-    this.getStoriesFromServer();
-
     return {
+      currentTagsState: this.props.tags,
       stories: [],
     };
   },
 
+  componentDidMount: function() {
+    // Let's create ajax-query for our stories...
+    this.getStoriesFromServer();
+  },
+
   render: function() {
-    var storiesElements = this.state.stories.map(function(v) {
+    // if tags have changed
+    if (this.state.currentTagsState !== this.props.tags) {
+      this.getStoriesFromServer();
+      this.state.currentTagsState = this.props.tags;
+    }
+
+    console.log('this.props.tags is: ', this.props.tags);
+
+    var storyElements = this.state.stories.map(function(v) {
       return <Story key={v.id} header={v.header} text={v.text} />
     });
 
@@ -110,7 +146,7 @@ var Stories = React.createClass({
             <h1>Hello new pretty world!</h1>
           </div>
 
-          {storiesElements}
+          {storyElements}
         </div>
       </div>);
   }

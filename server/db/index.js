@@ -109,5 +109,6 @@ Article.sync({force: true}) // TODO: Delete force property when realise app.
   });
 
 db.Article = Article;
+db.Sequelize = Sequelize;
 
 module.exports = db;
