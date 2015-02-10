@@ -26,13 +26,13 @@ var Container = React.createClass({
         console.log('self.tagNum is: ', self.tagNum);
         console.log('response is: ', response);
 
-        if (!self.tagNum || self.tagNum.length !== response.length) {
+        /*if (!self.tagNum || self.tagNum.length !== response.length) {
           self.setState({
             tagNum: response,
           });
-        }
+        }*/
       }
-    }
+    };
 
     request.open('GET', '/getStoriesNumber?tags=' + JSON.stringify(this.state.tags), true);
     request.send();

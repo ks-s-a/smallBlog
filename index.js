@@ -6,7 +6,7 @@ const db = require('./server/db'),
 
 console.log('db successefully created!');
 
-function *articlesGetter(tags) {
+function* articlesGetter(tags) {
 
   var tagObjectForQuery = translateTagsToQueryObj(tags);
   var rows = yield db.Article.findAll({
@@ -23,31 +23,46 @@ function *articlesGetter(tags) {
     }})
 }
 
-function *getArticlesNumber(tags) {
-  var tagObjectForQuery = translateTagsToQueryObj(tags);
+function* getArticlesNumber(tags) {
+  // convert entery array
+  var tagObjectForQuery = (tags && tags.length) ? translateTagsToQueryObj(tags) : null;
+
   var resultObject = {};
 
-  var activeTagsNumber = yield db.Article.count({
-    where: tagObjectForQuery,
-  });
-
-  console.log('activeTagsNumber is: ', activeTagsNumber);
-  console.log('tags is: ', tags);
-
-  for (var tag in tagMap) {
-    resultObject[tag] = tags.indexOf(+tag) !== -1 ?
-
-      activeTagsNumber :
-
-      yield db.Article.count({
-        where: db.Sequelize.and(
-          tagObjectForQuery,
-          Object.defineProperty({}, tagMap[tag], {value:true})
-        ),
-      });
+  // if tags is not null, count active articles
+  if (tagObjectForQuery) {
+    var activeTagsNumber = yield db.Article.count({
+      where: tagObjectForQuery,
+    });
   }
 
-  console.log(resultObject);
+
+  // craete query to db with sophisticated condition
+  for (var tag in tagMap) {
+    if (tagObjectForQuery && tagObjectForQuery[ tagMap[tag] ]) {
+      resultObject[tag] = activeTagsNumber;
+    }
+
+    else if (tagObjectForQuery) {
+      var conditionTag = {};
+      conditionTag[ tagMap[tag] ] = true;
+
+      resultObject[tag] = yield db.Article.count({
+        where: db.Sequelize.and(
+            tagObjectForQuery,
+            conditionTag
+          )
+      });
+    } else {
+      var conditionTag = {};
+      conditionTag[ tagMap[tag] ] = true;
+
+      resultObject[tag] = yield db.Article.count({
+        where: conditionTag,
+      });
+    }
+  }
+
   return resultObject;
 }
 

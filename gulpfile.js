@@ -7,10 +7,9 @@ gulp.task('default', ['convert:css'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
-    ext: 'html js styl jade',
+    ext: 'html js css jade styl',
     ignore: ['ignored.js'],
   })
-    .on('change', ['convert:css'])
     .on('restart', function() {
       console.log('nodemon restarted!');
     });
