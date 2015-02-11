@@ -1,20 +1,21 @@
 // Creating React components
-
 var Container = React.createClass({
   getInitialState: function() {
     return {
-      tagNames: {
-        1: 'Love',
-        2: 'Date',
-      },
+      tagNames: TAG_NAMES,
       tags: [],
+      tagsCash: '',
       tagNum: [],
     };
   },
 
-  getArticleCount: function(tags) {
-    var self = this;
+  _getArticleCount: function(tags) {
+    var tagsStr = JSON.stringify(this.state.tags);
 
+    if (tagsStr === this.state.tagsCash) return; // If tags didn't change
+    this.state.tagsCash = tagsStr; // Save current tags
+
+    var self = this;
     var request = new XMLHttpRequest();
 
     request.onreadystatechange = function() {
@@ -23,56 +24,57 @@ var Container = React.createClass({
       if (this.responseText) {
         var response = JSON.parse(this.responseText);
 
-        console.log('self.tagNum is: ', self.tagNum);
-        console.log('response is: ', response);
-
-        /*if (!self.tagNum || self.tagNum.length !== response.length) {
-          self.setState({
-            tagNum: response,
-          });
-        }*/
+        self.setState({
+          tagNum: response,
+        });
       }
     };
 
-    request.open('GET', '/getStoriesNumber?tags=' + JSON.stringify(this.state.tags), true);
+    request.open('GET', '/getStoriesNumber?tags=' + tagsStr, true);
     request.send();
   },
 
-  changeTags: function(arr) {
-    this.setState({tags: arr});
+  changeTags: function(index) { // Public function for component interaction
+    var newTagArr = this.state.tags.slice();
+    var arrIndex = newTagArr.indexOf(index);
+
+    // Add or reduce tag in the tagArr
+    if (arrIndex === -1) {
+      newTagArr.push(index);
+    } else {
+      newTagArr.splice(arrIndex, 1);
+    }
+
+    this.setState({tags: newTagArr});
   },
 
   render: function () {
-    this.getArticleCount(this.state.tags);
+    this._getArticleCount(this.state.tags);
 
     return (
       <div id="content-container">
-        <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagCount={this.state.tagCount} changeTagsFunction={this.changeTags.bind(null)} />
-        <Stories tagNames={this.state.tagNames} tags={this.state.tags} />
+        <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
+        <Stories tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags} />
       </div>
     );
   },
 });
 
 var TagList = React.createClass({
-  chooseTag: function(tagIndex) {
-    var newTagArr = this.props.tags.slice();
-    var arrIndex = newTagArr.indexOf(tagIndex);
-
-    if (arrIndex === -1) {
-      newTagArr.push(tagIndex);
-    } else {
-      newTagArr.splice(arrIndex, 1);
-    }
-
-    this.props.changeTagsFunction(newTagArr);
-  },
-
   render: function() {
     var tagElements = [];
 
     for (var i in this.props.tagNames)
-      tagElements.push(<TagButton name={this.props.tagNames[i]} state={this.props.tags.indexOf(+i) !== -1} key={i} index={i} chooseTag={this.chooseTag.bind(null)} count="42" />);
+      tagElements.push(
+        <TagButton
+          name={this.props.tagNames[i]}
+          state={this.props.tags.indexOf(+i) !== -1}
+          key={i}
+          index={i}
+          changeTagsFunction={this.props.changeTagsFunction}
+          count={this.props.tagNum[i]}
+        />
+      );
 
     return (<div id="side-buttons" className="col-lg-2 col-md-2 col-sm-2 hidden-xs">
         <div className="big-logo-container" />
@@ -87,7 +89,7 @@ var TagList = React.createClass({
 var TagButton = React.createClass({
   render: function() {
     return (<li className={this.props.state ? 'active' : ''} key={this.props.key} >
-        <a href="#" onClick={this.props.chooseTag.bind(null, +this.props.index)}>
+        <a href="#" onClick={this.props.changeTagsFunction.bind(null, +this.props.index)}>
           {this.props.name} <span className="badge">{this.props.count}</span>
         </a>
       </li>);
@@ -95,8 +97,7 @@ var TagButton = React.createClass({
 });
 
 var Stories = React.createClass({
-
-  getStoriesFromServer: function(startIndex) {
+  _getStoriesFromServer: function(startIndex) {
     var self = this;
     var startIndexString = startIndex ? '&start=' + startIndex : ''
 
@@ -124,20 +125,20 @@ var Stories = React.createClass({
 
   componentDidMount: function() {
     // Let's create ajax-query for our stories...
-    this.getStoriesFromServer();
+    this._getStoriesFromServer();
   },
 
   render: function() {
+    var self = this;
+
     // if tags have changed
     if (this.state.currentTagsState !== this.props.tags) {
-      this.getStoriesFromServer();
+      this._getStoriesFromServer();
       this.state.currentTagsState = this.props.tags;
     }
 
-    console.log('this.props.tags is: ', this.props.tags);
-
     var storyElements = this.state.stories.map(function(v) {
-      return <Story key={v.id} header={v.header} text={v.text} />
+      return <Story key={v.id} header={v.header} tags={v.tags} tagNames={self.props.tagNames} text={v.text} changeTagsFunction={self.props.changeTagsFunction} />
     });
 
     return (<div id="stories-container" className="col-lg-10 col-md-10 col-sm-10 col-xs-12">
@@ -154,10 +155,20 @@ var Stories = React.createClass({
 
 var Story = React.createClass({
   render: function() {
+    var self = this;
+
+    var tags = this.props.tags.map(function(v) {
+      return <a href="javascript:" className="text-muted story-tag-link" onClick={self.props.changeTagsFunction.bind(null, +v)}> {'#' + self.props.tagNames[+v]} </a>
+    });
+
     return (
       <div className="posts" key={this.props.key}>
         <h4> {this.props.header} </h4>
-        <p className="text-muted"> Some tags there. </p>
+
+        <div className="story-tags-area">
+          {tags}
+        </div>
+
         <p> {this.props.text} </p>
         <br />
       </div>

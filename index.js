@@ -1,10 +1,33 @@
 const db = require('./server/db'),
   app = require('./server/lib/app'),
   jade = require('jade'),
-  Sequa
   tagMap = require('./server/db/tagMap');
 
-console.log('db successefully created!');
+app
+  .get('/getStoriesNumber', function *() {
+    var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
+
+    this.status = 200;
+    this.body = JSON.stringify( yield getArticlesNumber(tags) );
+
+  })
+
+  .get('/getStories', function *() {
+    var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
+
+    this.status = 200;
+    this.body = JSON.stringify( yield articlesGetter(tags) );
+
+  })
+
+  .get('/', function *() {
+
+    var compile = jade.compileFile('./server/views/index.jade');
+    this.body = compile();
+
+  });
+
+app.listen(3000);
 
 function* articlesGetter(tags) {
 
@@ -16,9 +39,16 @@ function* articlesGetter(tags) {
   });
 
   return rows.map(function(v) {
+    var tags = [];
+
+    for (var tag in tagMap) {
+      if (v.dataValues[ tagMap[tag] ]) tags.push(tag);
+    }
+
     return {
       id: v.dataValues.id,
       header: v.dataValues.header,
+      tags: tags,
       text: v.dataValues.text,
     }})
 }
@@ -35,7 +65,6 @@ function* getArticlesNumber(tags) {
       where: tagObjectForQuery,
     });
   }
-
 
   // craete query to db with sophisticated condition
   for (var tag in tagMap) {
@@ -75,29 +104,3 @@ function translateTagsToQueryObj(tags) {
 
   return objForQuery;
 }
-
-app
-  .get('/getStoriesNumber', function *() {
-    var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
-
-    this.status = 200;
-    this.body = JSON.stringify( yield getArticlesNumber(tags) );
-
-  })
-
-  .get('/getStories', function *() {
-    var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
-
-    this.status = 200;
-    this.body = JSON.stringify( yield articlesGetter(tags) );
-
-  })
-
-  .get('/', function *() {
-
-    var compile = jade.compileFile('./server/views/index.jade');
-    this.body = compile();
-
-  });
-
-app.listen(3000);
