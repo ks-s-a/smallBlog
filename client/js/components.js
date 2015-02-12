@@ -1,11 +1,26 @@
+'use strict';
+
 // Creating React components
 var Container = React.createClass({
+  getDefaultProps: function() {
+    return {
+      queryTimeout: 1500,
+    };
+  },
+
   getInitialState: function() {
     return {
+      // Tags
       tagNames: TAG_NAMES,
       tags: [],
       tagsCash: '',
       tagNum: [],
+
+      // Stories
+      storyLastQueryTime: null,
+      stories: [],
+      isEndReached: false,
+      lastStoryId: null,
     };
   },
 
@@ -34,6 +49,40 @@ var Container = React.createClass({
     request.send();
   },
 
+  _getStoriesFromServer: function(startIndex) {
+    var currentTime = Date.now();
+
+    console.log('Go go query...');
+    if (this.state.isEndReached || this.state.storyLastQueryTime && (currentTime - this.state.storyLastQueryTime) < this.props.queryTimeout ) return;
+
+    var self = this;
+    var startIndexString = this.state.lastStoryId ? '&start=' + this.state.lastStoryId : ''
+
+    var request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+      if (this.readyState != 4) return; // запрос ещё не завершён
+
+      if (this.responseText) {
+        var storiesArr = JSON.parse(this.responseText);
+        var sortArr = storiesArr.sort(function(a, b) {
+          return a.id - b.id;
+        });
+        var lastStoryId = sortArr[sortArr.length - 1].id;
+
+        self.setState({
+          lastStoryId: lastStoryId,
+          stories: storiesArr,
+        });
+      }
+
+    }
+
+    request.open('GET', '/getStories?tags=' + JSON.stringify(this.state.tags) + startIndexString, true);
+    request.send();
+    this.setState({storyLastQueryTime: currentTime});
+  },
+
   changeTags: function(index) { // Public function for component interaction
     var newTagArr = this.state.tags.slice();
     var arrIndex = newTagArr.indexOf(index);
@@ -45,16 +94,69 @@ var Container = React.createClass({
       newTagArr.splice(arrIndex, 1);
     }
 
-    this.setState({tags: newTagArr});
+    this.setState({
+      tags: newTagArr,
+
+      // Default settings
+      storyLastQueryTime: null,
+      stories: [],
+      isEndReached: false,
+      lastStoryId: null,
+    });
+
+
+    //this._getStoriesFromServer();
+  },
+
+  componentDidMount: function () {
+    console.log('componentDidMount! : ', this.state);
+    document.addEventListener('scroll', this._isNeedExtraStories);
+
+    // Let's create ajax-query for our stories namber, stories itself will be loaded, when status has updated...
+    this._getArticleCount(this.state.tags);
+  },
+
+  componentDidUpdate: function () {
+    console.log('componentDidUpdate! : ', this.state);
+
+    if (this.state.stories.length === 0 &&
+      !this.state.storyLastQueryTime || (Date.now() - this.state.storyLastQueryTime > 1500) ) {
+
+      // Let's create ajax-query for new stories...
+      this._getStoriesFromServer();
+      this._getArticleCount(this.state.tags);
+    }
+  },
+
+  _isNeedExtraStories: function(event) {
+    if (!this._isEndCommingSoon(event)) return;
+
+    this._getStoriesFromServer();
+  },
+
+  _isEndCommingSoon: function(event) {
+    var rect = this.refs.heading.getDOMNode().getBoundingClientRect();
+    var html = document.documentElement;
+    var body = document.body;
+
+    var scrollTop = html.scrollTop || body && body.scrollTop || 0;
+
+    scrollTop -= html.clientTop;
+
+    return html.scrollHeight - scrollTop < html.clientHeight * .7;
   },
 
   render: function () {
-    this._getArticleCount(this.state.tags);
-
     return (
-      <div id="content-container">
+      <div id="content-container" ref="container">
         <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
-        <Stories tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags} />
+
+        <div id="heading" ref="heading" className="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+          <div id="main-header">
+            <h1>Hello new pretty world!</h1>
+          </div>
+          <Stories stories={this.state.stories} tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags} />
+        </div>
       </div>
     );
   },
@@ -97,59 +199,21 @@ var TagButton = React.createClass({
 });
 
 var Stories = React.createClass({
-  _getStoriesFromServer: function(startIndex) {
-    var self = this;
-    var startIndexString = startIndex ? '&start=' + startIndex : ''
-
-    var request = new XMLHttpRequest();
-
-    request.onreadystatechange = function() {
-      if (this.readyState != 4) return; // запрос ещё не завершён
-
-      if (this.responseText)
-        self.setState({
-          stories: JSON.parse(this.responseText),
-        });
-    }
-
-    request.open('GET', '/getStories?tags=' + JSON.stringify(this.props.tags) + startIndexString, true);
-    request.send();
-  },
-
-  getInitialState: function() {
-    return {
-      currentTagsState: this.props.tags,
-      stories: [],
-    };
-  },
-
-  componentDidMount: function() {
-    // Let's create ajax-query for our stories...
-    this._getStoriesFromServer();
-  },
-
   render: function() {
     var self = this;
-
-    // if tags have changed
-    if (this.state.currentTagsState !== this.props.tags) {
-      this._getStoriesFromServer();
-      this.state.currentTagsState = this.props.tags;
-    }
-
-    var storyElements = this.state.stories.map(function(v) {
-      return <Story key={v.id} header={v.header} tags={v.tags} tagNames={self.props.tagNames} text={v.text} changeTagsFunction={self.props.changeTagsFunction} />
+    var storyElements = this.props.stories.map(function(v) {
+      return <Story
+        key={v.id}
+        id={v.id}
+        header={v.header}
+        tags={v.tags}
+        tagNames={self.props.tagNames}
+        text={v.text}
+        changeTagsFunction={self.props.changeTagsFunction}
+      />
     });
 
-    return (<div id="stories-container" className="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-        <div id="heading" className="col-lg-12 col-md-12 col-sm-12 hidden-xs">
-          <div id="main-header">
-            <h1>Hello new pretty world!</h1>
-          </div>
-
-          {storyElements}
-        </div>
-      </div>);
+    return <div id="stories-container" ref="storiesContainer" className="col-lg-12 col-md-12 col-sm-12 col-xs-12">{storyElements}</div>;
   }
 });
 
@@ -162,7 +226,7 @@ var Story = React.createClass({
     });
 
     return (
-      <div className="posts" key={this.props.key}>
+      <div className="post" key={this.props.key} name={'post' + this.props.id}>
         <h4> {this.props.header} </h4>
 
         <div className="story-tags-area">
