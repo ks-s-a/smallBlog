@@ -4,17 +4,19 @@
 var Container = React.createClass({
   getDefaultProps: function() {
     return {
-      queryTimeout: 1500,
+      queryTimeout: 1000,
     };
   },
 
   getInitialState: function() {
     return {
+      // Common
+
+
       // Tags
       tagNames: TAG_NAMES,
       tags: [],
-      tagsCash: '',
-      tagNum: [],
+      tagNum: {},
 
       // Stories
       storyLastQueryTime: null,
@@ -24,13 +26,10 @@ var Container = React.createClass({
     };
   },
 
-  _getArticleCount: function(tags) {
-    var tagsStr = JSON.stringify(this.state.tags);
-
-    if (tagsStr === this.state.tagsCash) return; // If tags didn't change
-    this.state.tagsCash = tagsStr; // Save current tags
-
+  _getArticleCount: function() {
     var self = this;
+
+    var tagsStr = JSON.stringify(this.state.tags);
     var request = new XMLHttpRequest();
 
     request.onreadystatechange = function() {
@@ -40,6 +39,7 @@ var Container = React.createClass({
         var response = JSON.parse(this.responseText);
 
         self.setState({
+          // Tags
           tagNum: response,
         });
       }
@@ -49,83 +49,56 @@ var Container = React.createClass({
     request.send();
   },
 
-  _getStoriesFromServer: function(startIndex) {
+  _getStoriesFromServer: function() {
+
     var currentTime = Date.now();
 
-    console.log('Go go query...');
-    if (this.state.isEndReached || this.state.storyLastQueryTime && (currentTime - this.state.storyLastQueryTime) < this.props.queryTimeout ) return;
+    if (this.state.isEndReached ||
+      this.state.storyLastQueryTime && (currentTime - this.state.storyLastQueryTime) < this.props.queryTimeout ) {
+      return;
+    }
 
     var self = this;
-    var startIndexString = this.state.lastStoryId ? '&start=' + this.state.lastStoryId : ''
-
+    var lastIndexString = this.state.lastStoryId ? '&last=' + this.state.lastStoryId : ''
     var request = new XMLHttpRequest();
 
     request.onreadystatechange = function() {
       if (this.readyState != 4) return; // запрос ещё не завершён
 
       if (this.responseText) {
-        var storiesArr = JSON.parse(this.responseText);
-        var sortArr = storiesArr.sort(function(a, b) {
-          return a.id - b.id;
+        var newStoriesArr = JSON.parse(this.responseText);
+
+        // If no more stories
+        if (!newStoriesArr.length) {
+          console.log('No more stories!')
+          self.setState({
+            isEndReached: true,
+          });
+          return;
+        }
+
+        // Sort array by DESC
+        var sortArr = newStoriesArr.sort(function(a, b) {
+          return b.id - a.id;
         });
         var lastStoryId = sortArr[sortArr.length - 1].id;
+        var storiesArr = self.state.stories;
+
+        sortArr.forEach(function(v){
+          storiesArr.push(v);
+        })
 
         self.setState({
           lastStoryId: lastStoryId,
           stories: storiesArr,
         });
       }
-
     }
 
-    request.open('GET', '/getStories?tags=' + JSON.stringify(this.state.tags) + startIndexString, true);
+    request.open('GET', '/getStories?tags=' + JSON.stringify(this.state.tags) + lastIndexString, true);
     request.send();
+
     this.setState({storyLastQueryTime: currentTime});
-  },
-
-  changeTags: function(index) { // Public function for component interaction
-    var newTagArr = this.state.tags.slice();
-    var arrIndex = newTagArr.indexOf(index);
-
-    // Add or reduce tag in the tagArr
-    if (arrIndex === -1) {
-      newTagArr.push(index);
-    } else {
-      newTagArr.splice(arrIndex, 1);
-    }
-
-    this.setState({
-      tags: newTagArr,
-
-      // Default settings
-      storyLastQueryTime: null,
-      stories: [],
-      isEndReached: false,
-      lastStoryId: null,
-    });
-
-
-    //this._getStoriesFromServer();
-  },
-
-  componentDidMount: function () {
-    console.log('componentDidMount! : ', this.state);
-    document.addEventListener('scroll', this._isNeedExtraStories);
-
-    // Let's create ajax-query for our stories namber, stories itself will be loaded, when status has updated...
-    this._getArticleCount(this.state.tags);
-  },
-
-  componentDidUpdate: function () {
-    console.log('componentDidUpdate! : ', this.state);
-
-    if (this.state.stories.length === 0 &&
-      !this.state.storyLastQueryTime || (Date.now() - this.state.storyLastQueryTime > 1500) ) {
-
-      // Let's create ajax-query for new stories...
-      this._getStoriesFromServer();
-      this._getArticleCount(this.state.tags);
-    }
   },
 
   _isNeedExtraStories: function(event) {
@@ -144,6 +117,46 @@ var Container = React.createClass({
     scrollTop -= html.clientTop;
 
     return html.scrollHeight - scrollTop < html.clientHeight * .7;
+  },
+
+  // Public function for component interaction
+  changeTags: function(index) {
+    var newTagArr = this.state.tags.slice();
+    var arrIndex = newTagArr.indexOf(index);
+
+    // Add or reduce tag in the tagArr
+    if (arrIndex === -1) {
+      newTagArr.push(index);
+    } else {
+      newTagArr.splice(arrIndex, 1);
+    }
+
+    this.replaceState(this.getInitialState());
+
+    this.setState(
+      {
+        tags: newTagArr,
+      },
+
+      function () {
+        this._getArticleCount();
+        this._getStoriesFromServer();
+      });
+  },
+
+  componentWillMount: function () {
+    document.addEventListener('scroll', this._isNeedExtraStories);
+
+    this._getArticleCount();
+    this._getStoriesFromServer();
+  },
+
+  shouldComponentUpdate: function(nextProps, nextState) {
+
+    // If content not changes, then not render
+    if ( (nextState.tagNum === this.state.tagNum) && (nextState.lastStoryId === this.state.lastStoryId) ) return false;
+
+    return true;
   },
 
   render: function () {
@@ -171,11 +184,9 @@ var TagList = React.createClass({
         <TagButton
           name={this.props.tagNames[i]}
           state={this.props.tags.indexOf(+i) !== -1}
-          key={i}
           index={i}
           changeTagsFunction={this.props.changeTagsFunction}
-          count={this.props.tagNum[i]}
-        />
+          count={this.props.tagNum[i]} />
       );
 
     return (<div id="side-buttons" className="col-lg-2 col-md-2 col-sm-2 hidden-xs">
@@ -190,7 +201,7 @@ var TagList = React.createClass({
 
 var TagButton = React.createClass({
   render: function() {
-    return (<li className={this.props.state ? 'active' : ''} key={this.props.key} >
+    return (<li className={this.props.state ? 'active' : ''} >
         <a href="#" onClick={this.props.changeTagsFunction.bind(null, +this.props.index)}>
           {this.props.name} <span className="badge">{this.props.count}</span>
         </a>
@@ -203,14 +214,12 @@ var Stories = React.createClass({
     var self = this;
     var storyElements = this.props.stories.map(function(v) {
       return <Story
-        key={v.id}
         id={v.id}
         header={v.header}
         tags={v.tags}
         tagNames={self.props.tagNames}
         text={v.text}
-        changeTagsFunction={self.props.changeTagsFunction}
-      />
+        changeTagsFunction={self.props.changeTagsFunction} />
     });
 
     return <div id="stories-container" ref="storiesContainer" className="col-lg-12 col-md-12 col-sm-12 col-xs-12">{storyElements}</div>;
@@ -226,7 +235,7 @@ var Story = React.createClass({
     });
 
     return (
-      <div className="post" key={this.props.key} name={'post' + this.props.id}>
+      <div className="post" name={'post' + this.props.id}>
         <h4> {this.props.header} </h4>
 
         <div className="story-tags-area">

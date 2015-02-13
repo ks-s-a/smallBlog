@@ -14,9 +14,10 @@ app
 
   .get('/getStories', function *() {
     var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
+    var lastStory = this.query.last || null;
 
     this.status = 200;
-    this.body = JSON.stringify( yield articlesGetter(tags) );
+    this.body = JSON.stringify( yield articlesGetter(tags, lastStory) );
 
   })
 
@@ -29,11 +30,22 @@ app
 
 app.listen(3000);
 
-function* articlesGetter(tags) {
+function* articlesGetter(tags, lastStory) {
 
-  var tagObjectForQuery = translateTagsToQueryObj(tags);
+  console.log('lastStory is: ', lastStory);
+  var lastStoryObj = lastStory ? {
+    id: {
+      $lt: +lastStory,
+    },
+  } : {};
+
+  console.log('lastStoryObj is: ', lastStoryObj);
+
+  var tagObjectForQuery = margeObjects( translateTagsToQueryObj(tags), lastStoryObj );
+
+  console.log('tagObjectForQuery is: ', tagObjectForQuery);
   var rows = yield db.Article.findAll({
-    //limit: 3,
+    limit: 10,
     where: tagObjectForQuery,
     order: [['id', 'DESC']],
   });
@@ -103,4 +115,21 @@ function translateTagsToQueryObj(tags) {
   }
 
   return objForQuery;
+}
+
+// Merge all properties for all object, passing in the functnion
+function margeObjects() {
+  var objectArr = Array.prototype.slice.call(arguments);
+
+  if (!objectArr.length) return {};
+
+  return objectArr.reduce(function(p, c) {
+    if (c && Object.keys(c).length) {
+      for (var i in c) {
+        p[i] = c[i];
+      }
+    }
+
+    return p;
+  }, {});
 }
