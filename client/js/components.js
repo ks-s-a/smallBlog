@@ -10,9 +10,6 @@ var Container = React.createClass({
 
   getInitialState: function() {
     return {
-      // Common
-
-
       // Tags
       tagNames: TAG_NAMES,
       tags: [],
@@ -162,16 +159,57 @@ var Container = React.createClass({
   render: function () {
     return (
       <div id="content-container" ref="container">
+        <MobileList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
         <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
 
         <div id="heading" ref="heading" className="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-          <div id="main-header">
-            <h1>Hello new pretty world!</h1>
-          </div>
+
           <Stories stories={this.state.stories} tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags} />
         </div>
       </div>
     );
+  },
+});
+
+var MobileList = React.createClass({
+  showList: function(e) {
+    var buttonGroup = document.getElementById('mobile-panel-content');
+    buttonGroup.classList.toggle('hide');
+  },
+
+  render: function() {
+    var listButtons = [];
+
+    for (var i in this.props.tagNames)
+      listButtons.push(
+        <MobileListButton
+          name={this.props.tagNames[i]}
+          state={this.props.tags.indexOf(+i) !== -1}
+          index={i}
+          changeTagsFunction={this.props.changeTagsFunction}
+          count={this.props.tagNum[i]} />
+      );
+
+    return (<div id="mobile-panel" className="panel panel-default hidden-lg hidden-md hidden-sm col-xs-12">
+      <div className="panel-heading" onClick={this.showList} >
+        <h3 className="panel-title">Выбрать тему</h3>
+      </div>
+
+      <div id="mobile-panel-content" className={"panel-body " + (!!this.props.tags.length ? "" : "hide")} >
+        <div className="list-group">
+          {listButtons}
+        </div>
+      </div>
+
+    </div>);
+  },
+});
+
+var MobileListButton = React.createClass({
+  render: function() {
+    return (<a href="#" className={"list-group-item " + (this.props.state ? 'active' : '')} onClick={this.props.changeTagsFunction.bind(null, +this.props.index)}>
+          {this.props.name} <span className="badge">{this.props.count}</span>
+        </a>);
   },
 });
 
