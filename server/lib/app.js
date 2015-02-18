@@ -1,5 +1,6 @@
 const koa = require('koa'),
-  router = require('koa-router');
+  router = require('koa-router'),
+  bodyParser = require('koa-bodyparser');
 
 const app = koa();
 
@@ -12,7 +13,9 @@ app.use(function *checkTime(next) {
   console.log('%s %s - %s', this.method, this.url, ms);
 });
 
+app.use(bodyParser());
 app.use(router(app));
+
 app.use(require('koa-static')('./client'));
 
 app.on('error', function(err, ctx) {

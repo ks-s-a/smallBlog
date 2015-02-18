@@ -1,24 +1,28 @@
 const db = require('./server/db'),
   app = require('./server/lib/app'),
   jade = require('jade'),
-  tagMap = require('./server/db/tagMap');
+  tagMap = require('./server/db/tagMap'),
+  request = require('request'),
+  config = require('./server/config');
 
 app
   .get('/getStoriesNumber', function *() {
     var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
 
-    this.status = 200;
     this.body = JSON.stringify( yield getArticlesNumber(tags) );
-
   })
 
   .get('/getStories', function *() {
     var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
     var lastStory = this.query.last || null;
 
-    this.status = 200;
     this.body = JSON.stringify( yield articlesGetter(tags, lastStory) );
+  })
 
+  .get('/myStory', function *() {
+
+    var compile = jade.compileFile('./server/views/myStory.jade');
+    this.body = compile();
   })
 
   .get('/', function *() {
@@ -26,6 +30,25 @@ app
     var compile = jade.compileFile('./server/views/index.jade');
     this.body = compile();
 
+  })
+
+  .post('/createStory', function *() {
+    var body = this.request.body;
+
+    this.assert(body.title && body.story && body['g-recaptcha-response'], 401, {message: 'Ошибка запроса!'});
+
+    var urlString = 'https://www.google.com/recaptcha/api/siteverify?' +
+      'secret=' + config.secret +
+      '&response=' + body['g-recaptcha-response'] +
+      '&remoteip=' + this.request.ip;
+
+    request(urlString, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log(body) // Show the HTML for the Google homepage.
+      }
+    });
+
+    this.body = '';
   });
 
 app.listen(3000);
