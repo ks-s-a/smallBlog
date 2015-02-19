@@ -113,7 +113,7 @@ var Container = React.createClass({
 
     scrollTop -= html.clientTop;
 
-    return html.scrollHeight - scrollTop < html.clientHeight * .7;
+    return html.scrollHeight - scrollTop < html.clientHeight * 1.3;
   },
 
   // Public function for component interaction

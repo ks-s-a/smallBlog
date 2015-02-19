@@ -2,7 +2,7 @@ const db = require('./server/db'),
   app = require('./server/lib/app'),
   jade = require('jade'),
   tagMap = require('./server/db/tagMap'),
-  request = require('request'),
+  request = require('co-request'),
   config = require('./server/config');
 
 app
@@ -34,24 +34,31 @@ app
 
   .post('/createStory', function *() {
     var body = this.request.body;
+    console.log('body is: ', body);
 
-    this.assert(body.title && body.story && body['g-recaptcha-response'], 401, {message: 'Ошибка запроса!'});
+    this.assert(body.title && body.text && body.grecaptcha, 401, {message: 'Ошибка запроса!'});
 
     var urlString = 'https://www.google.com/recaptcha/api/siteverify?' +
       'secret=' + config.secret +
-      '&response=' + body['g-recaptcha-response'] +
+      '&response=' + body.grecaptcha +
       '&remoteip=' + this.request.ip;
 
-    request(urlString, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        console.log(body) // Show the HTML for the Google homepage.
-      }
-    });
+    var captchaResult = yield request(urlString);
+    console.log('captchaResult is: ', captchaResult.body);
+
+    yield addArticleToSandbox(body.title, body.text);
 
     this.body = '';
   });
 
 app.listen(3000);
+
+function* addArticleToSandbox(title, text, tags) {
+  yield db.Sandbox.create({
+    header: title.toString(),
+    text: text.toString(),
+  });
+}
 
 function* articlesGetter(tags, lastStory) {
 

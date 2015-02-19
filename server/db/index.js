@@ -26,7 +26,6 @@ var Article = sequelize.define('article', {
   header: {
     allowNull: false,
     type: Sequelize.STRING,
-    unique: false,
   },
   text: {
     allowNull: false,
@@ -39,6 +38,37 @@ var Article = sequelize.define('article', {
   loveTag: {
     type: Sequelize.BOOLEAN,
     allowNull: false,
+  },
+}, {
+  freezeTableName: true // Model tableName will be the same as the model name
+});
+
+var Sandbox = sequelize.define('sandbox', {
+  id: {
+    allowNull: false,
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  status: {
+    allowNull: true,
+    type: Sequelize.STRING,
+  },
+  header: {
+    allowNull: false,
+    type: Sequelize.STRING,
+  },
+  text: {
+    allowNull: false,
+    type: Sequelize.TEXT,
+  },
+  dateTag: {
+    type: Sequelize.BOOLEAN,
+    allowNull: true,
+  },
+  loveTag: {
+    type: Sequelize.BOOLEAN,
+    allowNull: true,
   },
 }, {
   freezeTableName: true // Model tableName will be the same as the model name
@@ -346,7 +376,10 @@ Article.sync({force: true}) // TODO: Delete force property when realise app.
     console.log('Model creation failed! Reason is: ', reason);
   });
 
+Sandbox.sync({force: true}) // TODO: Delete force property when realise app.
+
 db.Article = Article;
+db.Sandbox = Sandbox;
 db.Sequelize = Sequelize;
 
 module.exports = db;
