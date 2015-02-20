@@ -36,12 +36,21 @@ app
     var body = this.request.body;
     console.log('body is: ', body);
 
-    this.assert(body.title && body.text && body.grecaptcha, 401, {message: 'Ошибка запроса!'});
+    this.assert(body.grecaptcha, 403, {message: 'Подтвердите что вы не робот'});
+    this.assert(body.title && body.text, 403, {message: 'Ошибка запроса'});
+
+    this.assert(body.title.length > 5, 403, {message: 'Слишком короткий заголовок'});
+    this.assert(body.title.length < 100, 403, {message: 'Много букв в заголовке'});
+
+    this.assert(body.text.length > 500, 403, {message: 'Напишите подробнее'});
+    this.assert(body.text.length < 3000, 403, {message: 'История слишком длинная'});
 
     var urlString = 'https://www.google.com/recaptcha/api/siteverify?' +
       'secret=' + config.secret +
       '&response=' + body.grecaptcha +
       '&remoteip=' + this.request.ip;
+
+
 
     var captchaResult = yield request(urlString);
     console.log('captchaResult is: ', captchaResult.body);
@@ -62,18 +71,14 @@ function* addArticleToSandbox(title, text, tags) {
 
 function* articlesGetter(tags, lastStory) {
 
-  console.log('lastStory is: ', lastStory);
   var lastStoryObj = lastStory ? {
     id: {
       $lt: +lastStory,
     },
   } : {};
 
-  console.log('lastStoryObj is: ', lastStoryObj);
-
   var tagObjectForQuery = margeObjects( translateTagsToQueryObj(tags), lastStoryObj );
 
-  console.log('tagObjectForQuery is: ', tagObjectForQuery);
   var rows = yield db.Article.findAll({
     limit: 10,
     where: tagObjectForQuery,
