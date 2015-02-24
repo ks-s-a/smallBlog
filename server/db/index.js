@@ -377,6 +377,18 @@ Article.sync({force: true}) // TODO: Delete force property when realise app.
   });
 
 Sandbox.sync({force: true}) // TODO: Delete force property when realise app.
+.then(function() {
+    // Table created
+    Sandbox.create({
+      header: 'Первая статья',
+      text: 'lkdsjfg lkjsdlkfgj lksdjfg kldskfgj sgjiotrej iw howj ggog sjtiogj joig soidjfg.',
+    });
+
+    Sandbox.create({
+      header: 'Вторая статья',
+      text: 'ij3iojifilsdrilgjelsj glsij ligj lsdfjg ij5il jlisj glisej gliej li gjslig jilser jg.',
+    });
+})
 
 db.Article = Article;
 db.Sandbox = Sandbox;

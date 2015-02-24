@@ -19,9 +19,19 @@ app
     this.body = JSON.stringify( yield articlesGetter(tags, lastStory) );
   })
 
+  .get('/getStoriesForModeration', function *() {
+    this.body = JSON.stringify( yield getArticlesForModeration() );
+  })
+
   .get('/myStory', function *() {
 
     var compile = jade.compileFile('./server/views/myStory.jade');
+    this.body = compile();
+  })
+
+  .get('/moderation', function *() {
+
+    var compile = jade.compileFile('./server/views/moderation.jade');
     this.body = compile();
   })
 
@@ -69,6 +79,26 @@ function* addArticleToSandbox(title, text, tags) {
   });
 }
 
+function* getArticlesForModeration() {
+  return yield db.Sandbox.findAll({
+    attributes: ['id', 'header', 'text', 'createdAt'],
+    where: {
+      status: null,
+    },
+    order: [['id', 'DESC']],
+    limit: 10,
+  }).then(function(rows) {
+    return rows.map(function(v) {
+      return {
+        id: v.id,
+        header: v.header,
+        text: v.text,
+        createdAt: v.createdAt,
+      };
+    });
+  });
+}
+
 function* articlesGetter(tags, lastStory) {
 
   var lastStoryObj = lastStory ? {
@@ -79,13 +109,13 @@ function* articlesGetter(tags, lastStory) {
 
   var tagObjectForQuery = margeObjects( translateTagsToQueryObj(tags), lastStoryObj );
 
-  var rows = yield db.Article.findAll({
+  return yield db.Article.findAll({
     limit: 10,
     where: tagObjectForQuery,
     order: [['id', 'DESC']],
-  });
+  }).then(function(rows) {
 
-  return rows.map(function(v) {
+    return rows.map(function(v) {
     var tags = [];
 
     for (var tag in tagMap) {
@@ -98,6 +128,9 @@ function* articlesGetter(tags, lastStory) {
       tags: tags,
       text: v.dataValues.text,
     }})
+  });
+
+
 }
 
 function* getArticlesNumber(tags) {
