@@ -35,6 +35,15 @@ app
     this.body = compile();
   })
 
+  .post('/moderateStory', function *() {
+    var body = this.request.body;
+    console.log('moderateStory body is: ', body);
+
+    // TODO: Create story processing.
+
+    this.body = '';
+  })
+
   .get('/', function *() {
 
     var compile = jade.compileFile('./server/views/index.jade');
