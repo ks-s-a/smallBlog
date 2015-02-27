@@ -29,7 +29,7 @@ var Container = React.createClass({
     var self = this;
     var paramString =
       'title=' + event.target.querySelector('#mystory-title').value +
-      '&text=' + event.target.querySelector('#mystory-text').value +
+      '&text=' + encodeURIComponent(event.target.querySelector('#mystory-text').value) +
       '&grecaptcha=' + grecaptcha.getResponse();
 
     var request = new XMLHttpRequest();

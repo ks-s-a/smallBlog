@@ -4,7 +4,6 @@ const app = require('./app'),
   request = require('co-request'),
   routerLib = require('./lib/routerLib');
 
-
 app
   .get('/getStoriesNumber', function *() {
     var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
@@ -53,13 +52,18 @@ app
 
   .post('/createStory', function *() {
     var body = this.request.body;
-    console.log('body is: ', body);
 
     this.assert(body.grecaptcha, 403, {message: 'Подтвердите что вы не робот'});
     this.assert(body.title && body.text, 403, {message: 'Ошибка запроса'});
 
     this.assert(body.title.length > 5, 403, {message: 'Слишком короткий заголовок'});
     this.assert(body.title.length < 100, 403, {message: 'Много букв в заголовке'});
+
+    // Decoding and screening danger symbols
+    body.text = decodeURIComponent(body.text)
+      .replace(/&/g,'&lt;')
+      .replace(/</g,'&amp;');
+
 
     this.assert(body.text.length > 500, 403, {message: 'Напишите подробнее'});
     this.assert(body.text.length < 3000, 403, {message: 'История слишком длинная'});
@@ -69,10 +73,7 @@ app
       '&response=' + body.grecaptcha +
       '&remoteip=' + this.request.ip;
 
-
-
     var captchaResult = yield request(urlString);
-    console.log('captchaResult is: ', captchaResult.body);
 
     yield routerLib.addArticleToSandbox(body.title, body.text);
 
