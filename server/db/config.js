@@ -1,10 +1,7 @@
 var match = process.env.DATABASE_URL.match(/^postgres:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)\/(.+)$/);
 
 module.exports = {
-  isProduction = process.env.NODE_ENV === 'production',
-  database: match[5],
-  username: match[1],
-  password: match[2],
+  isProduction: process.env.NODE_ENV === 'production',
   dialect: 'postgres',
   protocol: 'postgres',
   port: match[4],
