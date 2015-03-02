@@ -25,7 +25,7 @@ sequelize.authenticate()
     console.log('authenticate successefull!');
   })
   .catch(function(err) {
-    console.err('authenticate failed! err: ', err);
+    console.error('authenticate failed! err: ', err);
   });
 
 db.sequelize = sequelize;
