@@ -1,1 +1,1 @@
-web: iojs index.js
+web: node --harmony index.js
