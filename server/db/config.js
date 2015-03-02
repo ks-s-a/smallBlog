@@ -1,7 +1,16 @@
+var match = process.env.DATABASE_URL.match(/postgres:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/)
+
 module.exports = {
-  database: 'process.env.DATABASE_URL',
-  username: 'hjqfwfyfwwjtia',
-  password: 'Q3fzeNF_QzTdn6Ue92WV0ywz7b',
+  database: match[5],
+  username: match[1],
+  password: match[2],
   host: 'process.env.DATABASE_URL',
   dialect: 'postgres',
+  protocol: 'postgres',
+  port:     match[4],
+  host:     match[3],
+  logging: false,
+  dialectOptions: {
+      ssl: true
+  }
 }

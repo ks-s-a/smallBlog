@@ -3,6 +3,9 @@ const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   dialect: config.dialect,
+  protocol: config.protocol,
+  port: config.port,
+  host: config.post,
 
   pool: {
     maxConnections: 50,
@@ -10,6 +13,8 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
     maxIdleTime: 10000
   },
 
+  logging: config.logging,
+  dialectOptions: config.dialectOptions,
 });
 
 var db = {};
