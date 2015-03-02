@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "./node_modules/bower/bin/bower install"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/ks-s-a/smallBlog",
   "dependencies": {
-    "bower": "0.6.x",
+    "bower": "^1.3.12",
     "co-request": "^0.2.0",
     "gulp": "^3.8.10",
     "gulp-nodemon": "^1.0.5",
@@ -35,8 +35,5 @@
   },
   "engines": {
     "node": "0.11.x"
-  },
-  "scripts": {
-
   }
 }
