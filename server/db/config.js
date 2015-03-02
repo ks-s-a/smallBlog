@@ -2,6 +2,6 @@ module.exports = {
   database: 'neo',
   username: 'neo',
   password: '',
-  host: 'localhost',
+  host: 'process.env.DATABASE_URL',
   dialect: 'postgres',
 }
