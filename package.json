@@ -35,6 +35,6 @@
     "rework-inline": "^0.2.0"
   },
   "engines": {
-    "node": "0.12.x"
+    "iojs": "1.x.x"
   },
 }
