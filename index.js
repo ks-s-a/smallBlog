@@ -1,4 +1,5 @@
-const app = require('./server/router');
+const app = require('./server/router'),
+  config = require('./server/config');
 
-app.listen(5000);
+app.listen(config.port);
 
