@@ -1,6 +1,7 @@
 const config = require('./config');
 const Sequelize = require('sequelize');
 
+console.log('config is: ', config);
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   dialect: config.dialect,
   protocol: config.protocol,
