@@ -8,7 +8,7 @@ module.exports = {
   protocol: 'postgres',
   port: match[4],
   host: match[3],
-  logging: false,
+  logging: true,
   dialectOptions: {
     native: true
   },
