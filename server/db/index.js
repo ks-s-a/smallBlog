@@ -19,14 +19,14 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 
 var db = {};
 
-sequelize.authenticate()
+/*sequelize.authenticate()
   .then(function() {
     console.log('authenticate successefull!');
   })
   .catch(function(err) {
     console.err('authenticate failed! err: ', err);
   });
-
+*/
 db.sequelize = sequelize;
 
 var Article = sequelize.define('article', {
