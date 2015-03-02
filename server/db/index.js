@@ -19,7 +19,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 
 var db = {};
 
-db.sequelize = sequelize;
+db.sequelize = yield sequelize.authenticate();
 
 var Article = sequelize.define('article', {
   id: {

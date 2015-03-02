@@ -6,10 +6,10 @@ module.exports = {
   password: match[2],
   dialect: 'postgres',
   protocol: 'postgres',
-  port:     match[4],
-  host:     match[3],
+  port: match[4],
+  host: match[3],
   logging: false,
   dialectOptions: {
-      ssl: true
-  }
+    native: true
+  },
 }
