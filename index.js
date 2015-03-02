@@ -1,4 +1,4 @@
 const app = require('./server/router');
 
-app.listen(3000);
+app.listen(80);
 
