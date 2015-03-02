@@ -1,6 +1,7 @@
 console.log('process.env.DATABASE_URL is: ', process.env.DATABASE_URL);
 var match = process.env.DATABASE_URL.match(/postgres:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)\/(.+)/);
 
+console.log('match is: ', match);
 module.exports = {
   database: match[5],
   username: match[1],
