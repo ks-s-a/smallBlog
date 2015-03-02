@@ -72,7 +72,7 @@ var Container = React.createClass({
             {this.state.modalMessage}
           </div>
           <div className="modal-footer">
-            <Button onClick={this._toggleModalWindow}>Вернуться</Button>
+            <Button bsStyle="primary" onClick={this._toggleModalWindow}>Вернуться</Button>
           </div>
         </Modal>
       );
