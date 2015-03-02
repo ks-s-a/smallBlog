@@ -4,7 +4,6 @@ module.exports = {
   database: match[5],
   username: match[1],
   password: match[2],
-  host: 'process.env.DATABASE_URL',
   dialect: 'postgres',
   protocol: 'postgres',
   port:     match[4],
