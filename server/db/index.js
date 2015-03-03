@@ -1,19 +1,35 @@
 const config = require('./config');
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: config.dialect,
-  protocol: config.protocol,
+const sequelize = config.isProduction ?
 
-  pool: {
-    maxConnections: 50,
-    minConnections: 0,
-    maxIdleTime: 10000
-  },
+  new Sequelize(process.env.DATABASE_URL, {
+    dialect: config.dialect,
+    protocol: config.protocol,
 
-  logging: config.logging,
-  dialectOptions: config.dialectOptions,
-});
+    pool: {
+      maxConnections: 50,
+      minConnections: 0,
+      maxIdleTime: 10000
+    },
+
+    logging: config.logging,
+    dialectOptions: config.dialectOptions,
+  }) :
+
+  new Sequelize(config.database, config.username, config.password, {
+    dialect: config.dialect,
+    protocol: config.protocol,
+
+    pool: {
+      maxConnections: 50,
+      minConnections: 0,
+      maxIdleTime: 10000
+    },
+
+    logging: config.logging,
+    dialectOptions: config.dialectOptions,
+  });
 
 var db = {};
 
