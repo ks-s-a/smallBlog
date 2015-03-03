@@ -1,5 +1,7 @@
 var match = process.env.DATABASE_URL.match(/^postgres:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)\/(.+)$/);
 
+console.log('process.env.NODE_ENV is: ', process.env.NODE_ENV);
+
 module.exports = process.env.NODE_ENV === 'production' ?
   {
     isProduction: true,
