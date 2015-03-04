@@ -1,7 +1,7 @@
-var match = process.env.DATABASE_URL.match(/^postgres:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)\/(.+)$/);
+if (process.env.NODE_ENV === 'production') {
+  var match = process.env.DATABASE_URL.match(/^postgres:\/\/([^:]+):([^@]+)@([^:]+):([^\/]+)\/(.+)$/);
 
-module.exports = process.env.NODE_ENV === 'production' ?
-  {
+  module.exports = {
     isProduction: true,
     dialect: 'postgres',
     protocol: 'postgres',
@@ -11,8 +11,11 @@ module.exports = process.env.NODE_ENV === 'production' ?
     dialectOptions: {
       native: true
     },
-  } :
-  {
+  };
+}
+
+else if (process.env.NODE_ENV === 'development') {
+  module.exports = {
     isProduction: false,
 
     dialect: 'postgres',
@@ -28,4 +31,25 @@ module.exports = process.env.NODE_ENV === 'production' ?
     dialectOptions: {
       native: true
     },
-  }
+  };
+}
+
+else {
+  module.exports = {
+    isProduction: false,
+
+    dialect: 'postgres',
+    protocol: 'postgres',
+
+    database: 'neo',
+    port: 5432,
+    host: 'localhost',
+    username: 'neo',
+    password: '',
+
+    logging: true,
+    dialectOptions: {
+      native: true
+    },
+  };
+}

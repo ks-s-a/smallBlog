@@ -2,12 +2,42 @@ const db = require('../db'),
   tagMap = require('../db/tagMap'),
   commonLib = require('./common');
 
+
+//--------------Sandbox----------------------------//
 function* addArticleToSandbox(title, text, tags) {
   yield db.Sandbox.create({
     header: title.toString(),
     text: text.toString(),
   });
 }
+
+function* approveSandboxArticle(storyId, header, text, tagsArr) {
+  var tagFields = tagsArr.reduce(function(p,c) {
+    if (tagMap[c]) {
+      p[tagMap[c]] = true;
+    }
+
+    return p;
+  }, {});
+
+  var valueObj = commonLib.margeObjects(tagFields, {
+    id: storyId,
+    header: header,
+    text: text,
+    status: 'approved',
+  });
+
+  yield db.Sandbox.upsert(valueObj);
+}
+
+function* removeArticleFromSandbox(storyId) {
+  yield db.Sandbox.destroy({
+    where: {
+      id: storyId,
+    },
+  });
+}
+//-------------------------------------------------//
 
 function* getArticlesForModeration() {
   return yield db.Sandbox.findAll({
@@ -59,8 +89,6 @@ function* articlesGetter(tags, lastStory) {
       text: v.dataValues.text,
     }})
   });
-
-
 }
 
 function* getArticlesNumber(tags) {
@@ -106,6 +134,9 @@ function* getArticlesNumber(tags) {
 }
 
 module.exports.addArticleToSandbox = addArticleToSandbox;
+module.exports.approveSandboxArticle = approveSandboxArticle;
+module.exports.removeArticleFromSandbox = removeArticleFromSandbox;
+
 module.exports.getArticlesForModeration = getArticlesForModeration;
 module.exports.articlesGetter = articlesGetter;
 module.exports.getArticlesNumber = getArticlesNumber;

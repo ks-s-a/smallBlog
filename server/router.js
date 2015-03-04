@@ -36,9 +36,20 @@ app
 
   .post('/moderateStory', function *() {
     var body = this.request.body;
-    console.log('moderateStory body is: ', body);
 
-    // TODO: Create story processing.
+    if (body.action === 'false') {
+      yield routerLib.removeArticleFromSandbox(+body.storyId);
+    }
+
+    else if (body.action === 'true') {
+      this.assert(body.tags, 400, {message: 'Не отмечены тэги статьи!'});
+
+      yield routerLib.approveSandboxArticle(+body.storyId, body.title, body.text, body.tags.split(','));
+    }
+
+    else {
+      this.throw(400, {message: 'Непонятный запрос!'});
+    }
 
     this.body = '';
   })
