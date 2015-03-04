@@ -50,12 +50,20 @@ var Container = React.createClass({
     request.send(paramString);
   },
 
+  componentDidMount: function() {
+
+    grecaptcha.render('captcha', {
+      'sitekey' : '6LcfSQITAAAAAE_LpS_ldiBZy94ly9-AJrGErt4l'
+    });
+
+  },
+
   render: function() {
     return (<form onSubmit={this._submit}>
       <Input id="mystory-title" type="text" label="Заглавие" />
       <Input id="mystory-text" type="textarea" label='История' rows="20" />
       <div className="mystory-submit-box" >
-        <div className="mystory-submit-captcha g-recaptcha" data-sitekey="6LcfSQITAAAAAE_LpS_ldiBZy94ly9-AJrGErt4l" />
+        <div id="captcha" />
         <Input className="mystory-submit-button" type="submit" bsStyle="success" value="Отправить" />
       </div>
     </form>);
