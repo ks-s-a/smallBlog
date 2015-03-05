@@ -15,11 +15,9 @@ var standartDBSettings = {
   dialectOptions: config.dialectOptions,
 };
 
-var db = new Sequelize(
-  config.isProduction ? process.env.DATABASE_URL : config.database,
-  config.isProduction ? standartDBSettings : config.username,
-  config.isProduction ? null : config.password,
-  config.isProduction ? null : standartDBSettings);
+var db = config.isProduction ?
+  new Sequelize(process.env.DATABASE_URL,standartDBSettings) :
+  new Sequelize(config.database , config.username, config.password, standartDBSettings);
 
 // Init tables it not yet...
 if (!db.models.article) {
