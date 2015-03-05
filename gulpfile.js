@@ -1,9 +1,11 @@
 var gulp = require('gulp'),
   styl = require('gulp-stylus'),
   inline = require('rework-inline'),
-  nodemon = require('gulp-nodemon');
+  nodemon = require('gulp-nodemon'),
+  db = require('./server/db'),
+  storyTransmitter = require('./server/lib/storyTransmitter');
 
-gulp.task('default', ['convert:css'], function () {
+gulp.task('default', ['convert:css', 'deamon:transmitter'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
@@ -21,6 +23,14 @@ gulp.task('convert:css', function(cb) {
       .pipe(gulp.dest('./client/css'));
 
   console.log('converting processing!');
+
+  cb();
+});
+
+gulp.task('deamon:transmitter', function(cb) {
+
+  console.log('deamon:transmitter started!');
+  setInterval(storyTransmitter.bind(this, db), 30000);
 
   cb();
 });

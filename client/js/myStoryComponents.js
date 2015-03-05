@@ -51,12 +51,11 @@ var Container = React.createClass({
   },
 
   componentDidMount: function() {
-    console.log('componentDidMount!!!');
 
+    // Captcha render
     window.grecaptcha.render('captcha', {
       'sitekey' : '6LcfSQITAAAAAE_LpS_ldiBZy94ly9-AJrGErt4l'
     });
-
   },
 
   render: function() {
