@@ -18,8 +18,8 @@ var standartDBSettings = {
 var db = new Sequelize(
   config.isProduction ? process.env.DATABASE_URL : config.database,
   config.isProduction ? standartDBSettings : config.username,
-  config.isProduction ? undefined : config.password,
-  config.isProduction ? undefined : standartDBSettings);
+  config.isProduction ? null : config.password,
+  config.isProduction ? null : standartDBSettings);
 
 // Init tables it not yet...
 if (!db.models.article) {
