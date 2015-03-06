@@ -113,7 +113,7 @@ var Container = React.createClass({
 
     scrollTop -= html.clientTop;
 
-    return html.scrollHeight - scrollTop < html.clientHeight * 1.3;
+    return html.scrollHeight - scrollTop < html.clientHeight * 1.5;
   },
 
   // Public function for component interaction
@@ -158,11 +158,11 @@ var Container = React.createClass({
 
   render: function () {
     return (
-      <div id="content-container" ref="container">
+      <div id="content">
         <MobileList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
         <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
 
-        <div id="heading" ref="heading" className="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+        <div id="heading" ref="heading" className="col-lg-9 col-md-9 col-sm-9 col-xs-12">
 
           <Stories stories={this.state.stories} tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags} />
         </div>
@@ -227,8 +227,10 @@ var TagList = React.createClass({
           count={this.props.tagNum[i]} />
       );
 
-    return (<div id="side-buttons" className="col-lg-2 col-md-2 col-sm-2 hidden-xs">
+    return (<div id="side-buttons" className="col-lg-3 col-md-3 col-sm-3 hidden-xs">
         <div className="big-logo-container" />
+
+        <h5>Темы:</h5>
 
         <ul className="nav nav-pills nav-stacked">
           {tagElements}
@@ -273,8 +275,8 @@ var Story = React.createClass({
     });
 
     return (
-      <div className="post" name={'post' + this.props.id}>
-        <h4> {this.props.header} </h4>
+      <article name={'post' + this.props.id}>
+        <h4 className='story-title' > {this.props.header} </h4>
 
         <div className="story-tags-area">
           {tags}
@@ -282,7 +284,7 @@ var Story = React.createClass({
 
         <p> {this.props.text} </p>
         <br />
-      </div>
+      </article>
     );
   }
 });
