@@ -161,7 +161,8 @@ var Container = React.createClass({
       <div id="content">
 
         <div className="main-picture col-lg-3 col-md-3 col-sm-3 hidden-xs">
-          <img src={window.location.search === '?var1' ? '/i/lstori_1.png' : '/i/lstori_2.png'} />
+          <img src={
+            window.location.search === '?var1' ? '/i/lstori_1.png' : window.location.search === '?var2' ? '/i/3.png' : '/i/lstori_2.png'} />
           <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
         </div>
 
