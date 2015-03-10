@@ -1,11 +1,15 @@
 var gulp = require('gulp'),
   styl = require('gulp-stylus'),
   inline = require('rework-inline'),
+  minifyCSS = require('gulp-minify-css'),
   nodemon = require('gulp-nodemon'),
   db = require('./server/db'),
-  storyTransmitter = require('./server/lib/storyTransmitter');
+  storyTransmitter = require('./server/lib/storyTransmitter'),
+  gutil = require('gulp-util'),
+  react = require('gulp-react'),
+  uglify = require('gulp-uglify');
 
-gulp.task('default', ['convert:css', 'deamon:transmitter'], function () {
+gulp.task('default', ['convert:css', 'minify:js', 'deamon:transmitter'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
@@ -20,9 +24,19 @@ gulp.task('default', ['convert:css', 'deamon:transmitter'], function () {
 gulp.task('convert:css', function(cb) {
   gulp.src(['./compile/css/*.styl'])
       .pipe(styl( inline() ))
+      .pipe(minifyCSS())
       .pipe(gulp.dest('./client/css'));
 
   console.log('converting processing!');
+
+  cb();
+});
+
+gulp.task('minify:js', function(cb) {
+  gulp.src(['./compile/js/*.jsx'])
+    .pipe(react({harmony: true}))
+    .pipe(uglify().on('error', gutil.log))
+    .pipe(gulp.dest('./client/js'));
 
   cb();
 });
