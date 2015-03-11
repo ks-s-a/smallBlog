@@ -1,4 +1,5 @@
 var gulp = require('gulp'),
+  autopolyfiller = require('gulp-autopolyfiller'),
   styl = require('gulp-stylus'),
   inline = require('rework-inline'),
   minifyCSS = require('gulp-minify-css'),
@@ -33,10 +34,16 @@ gulp.task('convert:css', function(cb) {
 });
 
 gulp.task('minify:js', function(cb) {
+
+
   gulp.src(['./compile/js/*.jsx'])
     .pipe(react({harmony: true}))
     .pipe(uglify().on('error', gutil.log))
     .pipe(gulp.dest('./client/js'));
+
+  /*gulp.src(['./client/js'])
+    .pipe(autopolyfiller('polifil.js'))
+    .pipe(gulp.dest('./client.js'));*/
 
   cb();
 });
