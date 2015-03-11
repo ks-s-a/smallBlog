@@ -10,7 +10,7 @@ var gulp = require('gulp'),
   react = require('gulp-react'),
   uglify = require('gulp-uglify');
 
-gulp.task('default', ['convert:css', 'minify:js', 'deamon:transmitter'], function () {
+gulp.task('default', ['convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
@@ -35,15 +35,18 @@ gulp.task('convert:css', function(cb) {
 
 gulp.task('minify:js', function(cb) {
 
-
   gulp.src(['./compile/js/*.jsx'])
     .pipe(react({harmony: true}))
     .pipe(uglify().on('error', gutil.log))
     .pipe(gulp.dest('./client/js'));
 
-  /*gulp.src(['./client/js'])
+  cb();
+});
+
+gulp.task('polifill:js', function(cb) {
+  gulp.src(['./client/js/*.js'])
     .pipe(autopolyfiller('polifil.js'))
-    .pipe(gulp.dest('./client.js'));*/
+    .pipe(gulp.dest('./client/js'));
 
   cb();
 });
