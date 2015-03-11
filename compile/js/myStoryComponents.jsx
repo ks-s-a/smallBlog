@@ -50,12 +50,15 @@ var Container = React.createClass({
     request.send(paramString);
   },
 
-  componentDidMount: function() {
+  componentDidMount: function captchaRender() {
 
-    // Captcha render
-    window.grecaptcha.render('captcha', {
-      'sitekey' : '6LcfSQITAAAAAE_LpS_ldiBZy94ly9-AJrGErt4l'
-    });
+    if (window.grecaptcha) {
+      window.grecaptcha.render('captcha', {
+        'sitekey' : '6LcfSQITAAAAAE_LpS_ldiBZy94ly9-AJrGErt4l'
+      });
+    } else {
+      setTimeout(captchaRender, 2000);
+    }
   },
 
   render: function() {
