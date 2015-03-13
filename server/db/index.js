@@ -21,6 +21,8 @@ var db = config.isProduction ?
     config.password,
     standartDBSettings);
 
+db.isProduction = config.isProduction;
+
 // Init tables...
 require('./models/Article')(db);
 require('./models/Sandbox')(db);
