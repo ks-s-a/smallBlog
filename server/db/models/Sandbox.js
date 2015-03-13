@@ -23,15 +23,37 @@ module.exports = function createSandboxModel(db) {
       type: db.Sequelize.BOOLEAN,
       allowNull: true,
     },
+    sexTag: {
+      type: db.Sequelize.BOOLEAN,
+      allowNull: true,
+    },
     loveTag: {
+      type: db.Sequelize.BOOLEAN,
+      allowNull: true,
+    },
+    workTag: {
+      type: db.Sequelize.BOOLEAN,
+      allowNull: true,
+    },
+    merrageTag: {
+      type: db.Sequelize.BOOLEAN,
+      allowNull: true,
+    },
+    fantasyTag: {
+      type: db.Sequelize.BOOLEAN,
+      allowNull: true,
+    },
+    moneyTag: {
+      type: db.Sequelize.BOOLEAN,
+      allowNull: true,
+    },
+    treasonTag: {
       type: db.Sequelize.BOOLEAN,
       allowNull: true,
     },
   }, {
     freezeTableName: true // Model tableName will be the same as the model name
   });
-
-  console.log('isPoduction is: ', db.isProduction);
 
   if (!db.isProduction) {
     // Fill tables test data
