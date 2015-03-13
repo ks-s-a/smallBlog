@@ -52,23 +52,25 @@ var Container = React.createClass({
 
 var Story = React.createClass({
   getInitialState: function() {
+
+    // Create void object for tag choose
+    var voidTagObject = {};
+    for (var i in TAG_NAMES) {
+      voidTagObject[i] = false;
+    }
+
     return {
-      choosenTags: [],
+      choosenTags: voidTagObject,
     };
   },
 
   _chooseTag: function(tagNum, event) {
-    var choosenTags = this.state.choosenTags;
-    var tagIndex = choosenTags.indexOf(tagNum);
+    console.log('this.state.choosenTags[tagNum] is: ', this.state.choosenTags[tagNum]);
 
-    if (tagIndex === -1) {
-      choosenTags.push(tagNum)
-    } else {
-      choosenTags.splice(tagIndex, 1);
-    }
+    this.state.choosenTags[tagNum] = !this.state.choosenTags[tagNum];
 
     this.setState({
-      choosenTags: choosenTags,
+      choosenTags: this.state.choosenTags,
     });
   },
 
@@ -82,7 +84,7 @@ var Story = React.createClass({
       'storyId=' + this.props.id +
       '&title=' + title +
       '&text=' + text +
-      '&tags=' + this.state.choosenTags +
+      '&tags=' + JSON.stringify(this.state.choosenTags) +
       '&action=' + action;
 
     var request = new XMLHttpRequest();
@@ -104,12 +106,15 @@ var Story = React.createClass({
   },
 
   render: function() {
+    console.log('i\'m render, sir! : ', this.state.choosenTags);
+
     var tags = [];
 
     for (var tag in TAG_NAMES) {
+      console.log('this.state.choosenTags.tag is: ', this.state.choosenTags.tag);
       tags.push(
         <Button
-          bsStyle={this.state.choosenTags.indexOf(tag) !== -1 ? 'primary' : 'default'}
+          bsStyle={this.state.choosenTags[tag] ? 'primary' : 'default'}
           bsSize="xsmall"
           className="tag-button"
           onClick={this._chooseTag.bind(this, tag)}>

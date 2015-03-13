@@ -44,7 +44,7 @@ app
     else if (body.action === 'true') {
       this.assert(body.tags, 400, {message: 'Не отмечены тэги статьи!'});
 
-      yield routerLib.approveSandboxArticle(+body.storyId, body.title, body.text, body.tags.split(','));
+      yield routerLib.approveSandboxArticle(+body.storyId, body.title, body.text, JSON.parse(body.tags) );
     }
 
     else {

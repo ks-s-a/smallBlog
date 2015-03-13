@@ -11,14 +11,14 @@ function* addArticleToSandbox(title, text, tags) {
   });
 }
 
-function* approveSandboxArticle(storyId, header, text, tagsArr) {
-  var tagFields = tagsArr.reduce(function(p,c) {
-    if (tagMap[c]) {
-      p[tagMap[c]] = true;
-    }
+function* approveSandboxArticle(storyId, header, text, tagsObj) {
+  var tagFields = {};
 
-    return p;
-  }, {});
+  for (var i in tagsObj) {
+    if (!tagMap[i]) throw 'Unknown tag name!';
+
+    tagFields[ tagMap[i] ] = tagsObj[i];
+  };
 
   var valueObj = commonLib.margeObjects(tagFields, {
     id: storyId,
