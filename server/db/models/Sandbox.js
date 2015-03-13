@@ -31,6 +31,8 @@ module.exports = function createSandboxModel(db) {
     freezeTableName: true // Model tableName will be the same as the model name
   });
 
+  console.log('isPoduction is: ', db.isProduction);
+
   if (!db.isProduction) {
     // Fill tables test data
     Sandbox.sync({force: true}) // TODO: Delete force property when realise app.
