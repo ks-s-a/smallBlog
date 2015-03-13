@@ -160,14 +160,14 @@ var Container = React.createClass({
     return (
       <div id="content">
 
-        <div className="col-lg-3 col-md-3 col-sm-3 hidden-xs">
+        <div className="col-lg-3 col-md-3 hidden-sm hidden-xs">
           <img className="main-picture" src='/i/heartPic.png' />
           <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
         </div>
 
         <MobileList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
 
-        <div id="heading" ref="heading" className="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+        <div id="heading" ref="heading" className="col-lg-9 col-md-9 col-sm-12 col-xs-12">
           <h1 id="main-header">Истории с чувством!</h1>
           <Stories stories={this.state.stories} tagNames={this.state.tagNames} tags={this.state.tags} changeTagsFunction={this.changeTags} />
         </div>
@@ -195,7 +195,7 @@ var MobileList = React.createClass({
           count={this.props.tagNum[i]} />
       );
 
-    return (<div id="mobile-panel" className="panel panel-default hidden-lg hidden-md hidden-sm col-xs-12">
+    return (<div id="mobile-panel" className="panel panel-default hidden-lg hidden-md col-sm-12 col-xs-12">
       <div className="panel-heading" onClick={this.showList} >
         <h3 className="panel-title">Выбрать тему</h3>
       </div>

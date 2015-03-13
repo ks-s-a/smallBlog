@@ -1,4 +1,6 @@
-module.exports = function (db) {
+const db = require('../db');
+
+module.exports = function () {
 
   db.Sandbox.find({
     where: {

@@ -1,6 +1,6 @@
 const db = require('../db'),
-  tagMap = require('../db/tagMap'),
-  commonLib = require('./common');
+  commonLib = require('./common'),
+  tagMap = require('../db/tagMap');
 
 
 //--------------Sandbox----------------------------//
@@ -39,6 +39,7 @@ function* removeArticleFromSandbox(storyId) {
 }
 //-------------------------------------------------//
 
+//----------------Moderation-----------------------//
 function* getArticlesForModeration() {
   return yield db.Sandbox.findAll({
     attributes: ['id', 'header', 'text', 'createdAt'],
@@ -58,7 +59,9 @@ function* getArticlesForModeration() {
     });
   });
 }
+//-------------------------------------------------//
 
+//----------------Main-page------------------------//
 function* articlesGetter(tags, lastStory) {
 
   var lastStoryObj = lastStory ? {
@@ -132,6 +135,7 @@ function* getArticlesNumber(tags) {
 
   return resultObject;
 }
+//-------------------------------------------------//
 
 module.exports.addArticleToSandbox = addArticleToSandbox;
 module.exports.approveSandboxArticle = approveSandboxArticle;

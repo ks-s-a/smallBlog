@@ -4,7 +4,6 @@ var gulp = require('gulp'),
   inline = require('rework-inline'),
   minifyCSS = require('gulp-minify-css'),
   nodemon = require('gulp-nodemon'),
-  db = require('./server/db'),
   storyTransmitter = require('./server/lib/storyTransmitter'),
   gutil = require('gulp-util'),
   react = require('gulp-react'),
@@ -54,7 +53,7 @@ gulp.task('polifill:js', function(cb) {
 gulp.task('deamon:transmitter', function(cb) {
 
   console.log('deamon:transmitter started!');
-  setInterval(storyTransmitter.bind(this, db), 30000);
+  setInterval(storyTransmitter, 30000);
 
   cb();
 });

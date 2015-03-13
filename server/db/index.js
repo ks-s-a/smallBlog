@@ -16,17 +16,16 @@ var standartDBSettings = {
 };
 
 var db = config.isProduction ?
-  new Sequelize(process.env.DATABASE_URL,standartDBSettings) :
-  new Sequelize(config.database , config.username, config.password, standartDBSettings);
+  new Sequelize(process.env.DATABASE_URL, standartDBSettings) :
+  new Sequelize(
+    config.database,
+    config.username,
+    config.password,
+    standartDBSettings);
 
-// Init tables it not yet...
-if (!db.models.article) {
-  require('./models/Article')(db);
-}
-
-if (!db.models.sandbox) {
-  require('./models/Sandbox')(db);
-}
+// Init tables...
+require('./models/Article')(db);
+require('./models/Sandbox')(db);
 
 db.Article = db.models.article;
 db.Sandbox = db.models.sandbox;
