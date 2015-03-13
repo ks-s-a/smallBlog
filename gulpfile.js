@@ -53,7 +53,7 @@ gulp.task('polifill:js', function(cb) {
 gulp.task('deamon:transmitter', function(cb) {
 
   console.log('deamon:transmitter started!');
-  setInterval(storyTransmitter, 30000);
+  setInterval(storyTransmitter, 10800000);
 
   cb();
 });

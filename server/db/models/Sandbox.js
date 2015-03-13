@@ -31,21 +31,26 @@ module.exports = function createSandboxModel(db) {
     freezeTableName: true // Model tableName will be the same as the model name
   });
 
-  Sandbox.sync({force: true}) // TODO: Delete force property when realise app.
-    .then(function() {
-      // Table created
-      Sandbox.create({
-        header: 'Первая статья',
-        text: 'lkdsjfg lkjsdlkfgj lksdjfg kldskfgj sgjiotrej iw howj ggog sjtiogj joig soidjfg.',
-      });
+  if (!db.isProduction) {
+    // Fill tables test data
+    Sandbox.sync({force: true}) // TODO: Delete force property when realise app.
+      .then(function() {
+        // Table created
+        Sandbox.create({
+          header: 'Первая статья',
+          text: 'lkdsjfg lkjsdlkfgj lksdjfg kldskfgj sgjiotrej iw howj ggog sjtiogj joig soidjfg.',
+        });
 
-      Sandbox.create({
-        header: 'Вторая статья',
-        text: 'ij3iojifilsdrilgjelsj glsij ligj lsdfjg ij5il jlisj glisej gliej li gjslig jilser jg.',
+        Sandbox.create({
+          header: 'Вторая статья',
+          text: 'ij3iojifilsdrilgjelsj glsij ligj lsdfjg ij5il jlisj glisej gliej li gjslig jilser jg.',
+        });
+      })
+      .catch(function(reason){
+        // failure!
+        console.log('Sandbox model creation failed! Reason is: ', reason);
       });
-    })
-    .catch(function(reason){
-      // failure!
-      console.log('Sandbox model creation failed! Reason is: ', reason);
-    });
+    } else {
+      Sandbox.sync();
+    }
 }
