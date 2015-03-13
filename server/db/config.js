@@ -7,7 +7,7 @@ if (process.env.NODE_ENV === 'production') {
     protocol: 'postgres',
     port: match[4],
     host: match[3],
-    logging: true,
+    logging: false,
     dialectOptions: {
       native: true
     },

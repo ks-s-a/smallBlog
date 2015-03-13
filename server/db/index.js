@@ -6,8 +6,6 @@ var standartDBSettings = {
   protocol: config.protocol,
 
   pool: {
-    maxConnections: 50,
-    minConnections: 0,
     maxIdleTime: 10000
   },
 
