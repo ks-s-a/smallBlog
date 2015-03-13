@@ -65,8 +65,6 @@ var Story = React.createClass({
   },
 
   _chooseTag: function(tagNum, event) {
-    console.log('this.state.choosenTags[tagNum] is: ', this.state.choosenTags[tagNum]);
-
     this.state.choosenTags[tagNum] = !this.state.choosenTags[tagNum];
 
     this.setState({
@@ -111,7 +109,6 @@ var Story = React.createClass({
     var tags = [];
 
     for (var tag in TAG_NAMES) {
-      console.log('this.state.choosenTags.tag is: ', this.state.choosenTags.tag);
       tags.push(
         <Button
           bsStyle={this.state.choosenTags[tag] ? 'primary' : 'default'}
