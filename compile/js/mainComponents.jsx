@@ -196,9 +196,7 @@ var MobileList = React.createClass({
       );
 
     return (<div id="mobile-panel" className="panel panel-default hidden-lg hidden-md col-sm-12 col-xs-12">
-      <div className="panel-heading" onClick={this.showList} >
-        <h3 className="panel-title">Выбрать тему</h3>
-      </div>
+      <div className="panel-heading" onClick={this.showList} >Выбрать тему</div>
 
       <div id="mobile-panel-content" className={"panel-body " + (!!this.props.tags.length ? "" : "hide")} >
         <div className="list-group">
@@ -277,6 +275,8 @@ var Story = React.createClass({
       return <a href="javascript:" className="text-muted story-tag-link" onClick={self.props.changeTagsFunction.bind(null, +v)}> {'#' + self.props.tagNames[+v]} </a>
     });
 
+    var parags;
+
     return (
       <article name={'post' + this.props.id}>
         <h4 className='story-title' > {this.props.header} </h4>
@@ -285,8 +285,7 @@ var Story = React.createClass({
           {tags}
         </div>
 
-        <p> {this.props.text} </p>
-        <br />
+        {this.props.text.split('\n').map(function(v){return <p> {v} </p>})}
       </article>
     );
   }
