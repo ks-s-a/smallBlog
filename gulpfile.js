@@ -9,7 +9,7 @@ var gulp = require('gulp'),
   react = require('gulp-react'),
   uglify = require('gulp-uglify');
 
-gulp.task('default', ['convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter'], function () {
+gulp.task('default', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
@@ -19,6 +19,14 @@ gulp.task('default', ['convert:css', 'minify:js', 'polifill:js', 'deamon:transmi
     .on('restart', function() {
       console.log('nodemon restarted!');
     });
+});
+
+gulp.task('convert:jsx', function(cb) {
+  gulp.src(['./compile/prerender/*.jsx'])
+    .pipe(react({harmony: true}))
+    .pipe(gulp.dest('./server/reactComponents'));
+
+  cb();
 });
 
 gulp.task('convert:css', function(cb) {

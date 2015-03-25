@@ -1,6 +1,7 @@
 const app = require('./app'),
   config = require('./config'),
   jade = require('jade'),
+  react = require('react'),
   request = require('co-request'),
   routerLib = require('./lib/routerLib');
 
@@ -55,10 +56,36 @@ app
   })
 
   .get('/', function *() {
+    var from = +this.query.from || null;
+
+    var storyLastId = yield routerLib.lastStoryId();
+    var lastTenStories = yield routerLib.articlesGetter(null, from);
+    var storiesMap = yield routerLib.getArticlesNumber();
+    var prevLink = from && (from + 10) < storyLastId ?
+      '/?from=' + (from + 10) :
+      (from + 10) === storyLastId ? '/' : false;
+    var nextLink = from ?
+      from > 10 ? '/?from=' + (from - 10) : false :
+      '/?from=' + (storyLastId - 10);
+
+    var reactElement = react.createElement( require('./reactComponents/main.js'), {
+      stories: lastTenStories,
+    } );
+
+    var compileDataObj = {
+      data: {
+        init: JSON.stringify({
+          storiesCount: storiesMap,
+          stories:  lastTenStories,
+        }),
+        prevLink: prevLink,
+        nextLink: nextLink,
+        html: react.renderToString( reactElement ),
+      },
+    };
 
     var compile = jade.compileFile('./server/views/index.jade');
-    this.body = compile();
-
+    this.body = compile(compileDataObj);
   })
 
   .post('/createStory', function *() {

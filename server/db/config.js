@@ -27,7 +27,7 @@ else if (process.env.NODE_ENV === 'development') {
     username: 'neo',
     password: '',
 
-    logging: true,
+    logging: false,
     dialectOptions: {
       native: true
     },
@@ -47,7 +47,7 @@ else {
     username: 'neo',
     password: '',
 
-    logging: true,
+    logging: false,
     dialectOptions: {
       native: true
     },

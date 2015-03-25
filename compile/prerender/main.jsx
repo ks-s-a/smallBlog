@@ -1,4 +1,5 @@
-'use strict';
+const React = require('react'),
+  TAG_NAMES = require('./config.js');
 
 // Creating React components
 var Container = React.createClass({
@@ -13,13 +14,13 @@ var Container = React.createClass({
       // Tags
       tagNames: TAG_NAMES,
       tags: [],
-      tagNum: this.props.initialState.storiesCount || {},
+      tagNum: {},
 
       // Stories
       storyLastQueryTime: null,
-      stories: this.props.initialState.stories || [],
+      stories: this.props.stories || [],
       isEndReached: false,
-      lastStoryId: this.props.initialState.stories && this.props.initialState.stories[this.props.initialState.stories.length - 1].id,
+      lastStoryId: null,
     };
   },
 
@@ -141,12 +142,6 @@ var Container = React.createClass({
       });
   },
 
-  componentWillMount: function () {
-    if (document) { // if client-side
-      document.addEventListener('scroll', this._isNeedExtraStories);
-    }
-  },
-
   shouldComponentUpdate: function(nextProps, nextState) {
 
     // If content not changes, then not render
@@ -160,7 +155,7 @@ var Container = React.createClass({
       <div id="content">
 
         <div className="col-lg-3 col-md-3 hidden-sm hidden-xs">
-          <img className="main-picture" src={document ? '/i/heartPic.png' : '/client/i/heartPic.png'} />
+          <img className="main-picture" src={'/i/heartPic.png'} />
           <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
         </div>
 
@@ -195,7 +190,7 @@ var MobileList = React.createClass({
       );
 
     return (<div id="mobile-panel" className="panel panel-default hidden-lg hidden-md col-sm-12 col-xs-12">
-      <div className="panel-heading" onClick={document ? this.showList.bind(this) : ''} >Выбрать тему</div>
+      <div className="panel-heading">Выбрать тему</div>
 
       <div id="mobile-panel-content" ref="mobilePanel" className={"panel-body " + (!!this.props.tags.length ? "" : "hide")} >
         <div className="list-group">
@@ -290,4 +285,5 @@ var Story = React.createClass({
   }
 });
 
-React.render(<Container initialState={INITIAL_STATE} />, document.getElementById('content-container'));
+// Export react class
+module.exports = Container;

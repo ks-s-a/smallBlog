@@ -62,6 +62,10 @@ function* getArticlesForModeration() {
 //-------------------------------------------------//
 
 //----------------Main-page------------------------//
+function* lastStoryId() {
+  return yield db.Article.max('id');
+}
+
 function* articlesGetter(tags, lastStory) {
 
   var lastStoryObj = lastStory ? {
@@ -141,6 +145,7 @@ module.exports.addArticleToSandbox = addArticleToSandbox;
 module.exports.approveSandboxArticle = approveSandboxArticle;
 module.exports.removeArticleFromSandbox = removeArticleFromSandbox;
 
-module.exports.getArticlesForModeration = getArticlesForModeration;
 module.exports.articlesGetter = articlesGetter;
+module.exports.getArticlesForModeration = getArticlesForModeration;
 module.exports.getArticlesNumber = getArticlesNumber;
+module.exports.lastStoryId = lastStoryId;
