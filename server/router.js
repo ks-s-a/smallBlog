@@ -66,7 +66,7 @@ app
       (from + 10) === storyLastId ? '/' : false;
     var nextLink = from ?
       from > 10 ? '/?from=' + (from - 10) : false :
-      '/?from=' + (storyLastId - 10);
+      storyLastId > 10 ? '/?from=' + (storyLastId - 10) : false;
 
     var reactElement = react.createElement( require('./reactComponents/main.js'), {
       stories: lastTenStories,
