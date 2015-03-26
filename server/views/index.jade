@@ -13,6 +13,8 @@ head
 
   if data.prevLink
     link(href=data.prevLink, rel="prev")
+  else
+    link(href="/", rel="canonical")
   if data.nextLink
     link(href=data.nextLink, rel="next")
 
