@@ -166,7 +166,7 @@ var Container = React.createClass({
       <div id="content">
 
         <div className="col-lg-3 col-md-3 hidden-sm hidden-xs">
-          <img className="main-picture" src={document ? '/i/heartPic.png' : '/client/i/heartPic.png'} />
+          <img className="main-picture" src={document ? '/i/heartPic.png' : '/client/i/heartPic.png'} alt="big-heart" />
           <TagList tagNames={this.state.tagNames} tags={this.state.tags} tagNum={this.state.tagNum} changeTagsFunction={this.changeTags} />
         </div>
 
