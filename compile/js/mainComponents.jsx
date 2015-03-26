@@ -133,6 +133,12 @@ var Container = React.createClass({
     this.setState(
       {
         tags: newTagArr,
+        tagNum: {},
+
+        storyLastQueryTime: null,
+        stories: [],
+        isEndReached: false,
+        lastStoryId: null,
       },
 
       function () {
