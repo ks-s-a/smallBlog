@@ -155,7 +155,7 @@ var Container = React.createClass({displayName: "Container",
       React.createElement("div", {id: "content"}, 
 
         React.createElement("div", {className: "col-lg-3 col-md-3 hidden-sm hidden-xs"}, 
-          React.createElement("img", {className: "main-picture", src: '/i/heartPic.png'}), 
+          React.createElement("img", {className: "main-picture", src: '/i/heartPic.png', alt: "big-heart"}), 
           React.createElement(TagList, {tagNames: this.state.tagNames, tags: this.state.tags, tagNum: this.state.tagNum, changeTagsFunction: this.changeTags})
         ), 
 
