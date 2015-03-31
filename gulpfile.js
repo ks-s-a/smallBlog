@@ -21,7 +21,12 @@ gulp.task('default', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 
     });
 });
 
-gulp.task('start', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter']);
+gulp.task('start', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter'], function () {
+  nodemon({
+    script: 'index.js',
+    execMap: {"js": "node --harmony"},
+  });
+});
 
 gulp.task('convert:jsx', function(cb) {
   gulp.src(['./compile/prerender/*.jsx'])
