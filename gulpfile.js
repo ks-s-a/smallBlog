@@ -21,6 +21,8 @@ gulp.task('default', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 
     });
 });
 
+gulp.task('start', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter']);
+
 gulp.task('convert:jsx', function(cb) {
   gulp.src(['./compile/prerender/*.jsx'])
     .pipe(react({harmony: true}))
@@ -61,7 +63,7 @@ gulp.task('polifill:js', function(cb) {
 gulp.task('deamon:transmitter', function(cb) {
 
   console.log('deamon:transmitter started!');
-  setInterval(storyTransmitter, 100000/*10800000*/);
+  setInterval(storyTransmitter, 10800000);
 
   cb();
 });
