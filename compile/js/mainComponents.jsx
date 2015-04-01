@@ -67,7 +67,8 @@ var Container = React.createClass({
 
         // If no more stories
         if (!newStoriesArr.length) {
-          console.log('No more stories!')
+          yaCounter28879505.reachGoal('LOAD');
+
           self.setState({
             isEndReached: true,
           });
