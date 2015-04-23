@@ -1,4 +1,4 @@
-'use strict';
+var React = require('react');
 
 // Creating React components
 var Container = React.createClass({
@@ -297,4 +297,4 @@ var Story = React.createClass({
   }
 });
 
-React.render(<Container initialState={INITIAL_STATE} />, document.getElementById('content-container'));
+module.exports = Container;

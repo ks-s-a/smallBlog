@@ -1,7 +1,7 @@
 const app = require('./app'),
   config = require('./config'),
   jade = require('jade'),
-  react = require('react'),
+  React = require('react'),
   request = require('co-request'),
   routerLib = require('./lib/routerLib');
 
@@ -58,9 +58,10 @@ app
   .get('/', function *() {
     var from = +this.query.from || null;
 
-    var storyLastId = yield routerLib.lastStoryId();
-    var lastTenStories = yield routerLib.articlesGetter(null, from);
-    var storiesMap = yield routerLib.getArticlesNumber();
+    const storyLastId = yield routerLib.lastStoryId();
+    const lastTenStories = yield routerLib.articlesGetter(null, from);
+    const storiesMap = yield routerLib.getArticlesNumber();
+
     var prevLink = from && (from + 10) < storyLastId ?
       '/?from=' + (from + 10) :
       (from + 10) === storyLastId ? '/' : false;
@@ -68,19 +69,21 @@ app
       from > 10 ? '/?from=' + (from - 10) : false :
       storyLastId > 10 ? '/?from=' + (storyLastId - 10) : false;
 
-    var reactElement = react.createElement( require('./reactComponents/main.js'), {
+    var reactElement = React.createElement( require('./reactComponents/main.js'), {
       stories: lastTenStories,
+      tagNames: require('./reactComponents/config.js'),
+      tagNum: storiesMap,
     } );
 
     var compileDataObj = {
       data: {
         init: JSON.stringify({
-          storiesCount: storiesMap,
+          tagNum: storiesMap,
           stories:  lastTenStories,
         }),
         prevLink: prevLink,
         nextLink: nextLink,
-        html: react.renderToString( reactElement ),
+        html: React.renderToString( reactElement ),
       },
     };
 

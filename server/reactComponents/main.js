@@ -1,5 +1,4 @@
-const React = require('react'),
-  TAG_NAMES = require('./config.js');
+var React = require('react');
 
 // Creating React components
 var Container = React.createClass({displayName: "Container",
@@ -12,9 +11,7 @@ var Container = React.createClass({displayName: "Container",
   getInitialState: function() {
     return {
       // Tags
-      tagNames: TAG_NAMES,
-      tags: [],
-      tagNum: {},
+      activeTag: null,
 
       // Stories
       storyLastQueryTime: null,
@@ -24,31 +21,7 @@ var Container = React.createClass({displayName: "Container",
     };
   },
 
-  _getArticleCount: function() {
-    var self = this;
-
-    var tagsStr = JSON.stringify(this.state.tags);
-    var request = new XMLHttpRequest();
-
-    request.onreadystatechange = function() {
-      if (this.readyState != 4) return; // Query is not competed
-
-      if (this.responseText) {
-        var response = JSON.parse(this.responseText);
-
-        self.setState({
-          // Tags
-          tagNum: response,
-        });
-      }
-    };
-
-    request.open('GET', '/getStoriesNumber?tags=' + tagsStr, true);
-    request.send();
-  },
-
   _getStoriesFromServer: function() {
-
     var currentTime = Date.now();
 
     if (this.state.isEndReached ||
@@ -69,10 +42,9 @@ var Container = React.createClass({displayName: "Container",
         // If no more stories
         if (!newStoriesArr.length) {
           console.log('No more stories!')
-          self.setState({
+          return self.setState({
             isEndReached: true,
           });
-          return;
         }
 
         // Sort array by DESC
@@ -93,20 +65,19 @@ var Container = React.createClass({displayName: "Container",
       }
     }
 
-    request.open('GET', '/getStories?tags=' + JSON.stringify(this.state.tags) + lastIndexString, true);
+    request.open('GET', '/getStories?tags=' + JSON.stringify(this.state.activeTag ? [this.state.activeTag] : []) + lastIndexString, true);
     request.send();
 
     this.setState({storyLastQueryTime: currentTime});
   },
 
   _isNeedExtraStories: function(event) {
-    if (!this._isEndCommingSoon(event)) return;
-
-    this._getStoriesFromServer();
+    if (this._isEndCommingSoon(event))
+      this._getStoriesFromServer();
   },
 
   _isEndCommingSoon: function(event) {
-    var rect = this.refs.heading.getDOMNode().getBoundingClientRect();
+    var rect = document.getElementById('heading').getBoundingClientRect();
     var html = document.documentElement;
     var body = document.body;
 
@@ -119,51 +90,39 @@ var Container = React.createClass({displayName: "Container",
 
   // Public function for component interaction
   changeTags: function(index) {
-    var newTagArr = this.state.tags.slice();
-    var arrIndex = newTagArr.indexOf(index);
+    console.log('new tag is: ', index);
 
-    // Add or reduce tag in the tagArr
-    if (arrIndex === -1) {
-      newTagArr.push(index);
-    } else {
-      newTagArr.splice(arrIndex, 1);
-    }
-
-    this.replaceState(this.getInitialState());
-
-    this.setState(
-      {
-        tags: newTagArr,
-      },
-
-      function () {
-        this._getArticleCount();
+    this.setState({
+        activeTag: this.state.activeTag === +index ? null : +index, // set or reset
+        isEndReached: false,
+        lastStoryId: null,
+        stories: [],
+        storyLastQueryTime: null,
+      }, function () {
         this._getStoriesFromServer();
       });
   },
 
-  shouldComponentUpdate: function(nextProps, nextState) {
-
-    // If content not changes, then not render
-    if ( (nextState.tagNum === this.state.tagNum) && (nextState.lastStoryId === this.state.lastStoryId) ) return false;
-
-    return true;
+  componentDidMount: function() {
+    document.addEventListener('scroll', this._isNeedExtraStories);
   },
 
   render: function () {
+    console.log('stories: ', this.state.stories);
+
     return (
       React.createElement("div", {id: "content"}, 
 
         React.createElement("div", {className: "col-lg-3 col-md-3 hidden-sm hidden-xs"}, 
           React.createElement("img", {className: "main-picture", src: '/i/heartPic.png', alt: "big-heart"}), 
-          React.createElement(TagList, {tagNames: this.state.tagNames, tags: this.state.tags, tagNum: this.state.tagNum, changeTagsFunction: this.changeTags})
+          React.createElement(TagList, {tagNames: this.props.tagNames, activeTag: this.state.activeTag, tagNum: this.props.tagNum, changeTagsFunction: this.changeTags})
         ), 
 
-        React.createElement(MobileList, {tagNames: this.state.tagNames, tags: this.state.tags, tagNum: this.state.tagNum, changeTagsFunction: this.changeTags}), 
+        React.createElement(MobileList, {tagNames: this.props.tagNames, tag: this.state.activeTag, tagNum: this.props.tagNum, changeTagsFunction: this.changeTags}), 
 
-        React.createElement("div", {id: "heading", ref: "heading", className: "col-lg-9 col-md-9 col-sm-12 col-xs-12"}, 
+        React.createElement("div", {id: "heading", className: "col-lg-9 col-md-9 col-sm-12 col-xs-12"}, 
           React.createElement("h1", {id: "main-header"}, "Истории с чувством!"), 
-          React.createElement(Stories, {stories: this.state.stories, tagNames: this.state.tagNames, tags: this.state.tags, changeTagsFunction: this.changeTags})
+          React.createElement(Stories, {stories: this.state.stories, tagNames: this.props.tagNames, changeTagsFunction: this.changeTags})
         )
       )
     );
@@ -171,9 +130,14 @@ var Container = React.createClass({displayName: "Container",
 });
 
 var MobileList = React.createClass({displayName: "MobileList",
+  getInitialState: function() {
+    return {
+      isShow: !!this.props.tag,
+    };
+  },
+
   showList: function(e) {
-    var buttonGroup = React.findDOMNode(this.refs.mobilePanel);
-    buttonGroup.classList.toggle('hide');
+    this.setState({isShow: !this.state.isShow});
   },
 
   render: function() {
@@ -183,16 +147,16 @@ var MobileList = React.createClass({displayName: "MobileList",
       listButtons.push(
         React.createElement(MobileListButton, {
           name: this.props.tagNames[i], 
-          state: this.props.tags.indexOf(+i) !== -1, 
+          state: this.props.tag === +i, 
           index: i, 
           changeTagsFunction: this.props.changeTagsFunction, 
           count: this.props.tagNum[i]})
       );
 
     return (React.createElement("div", {id: "mobile-panel", className: "panel panel-default hidden-lg hidden-md col-sm-12 col-xs-12"}, 
-      React.createElement("div", {className: "panel-heading"}, "Выбрать тему"), 
+      React.createElement("div", {className: "panel-heading", onClick: this.showList}, "Выбрать тему"), 
 
-      React.createElement("div", {id: "mobile-panel-content", ref: "mobilePanel", className: "panel-body " + (!!this.props.tags.length ? "" : "hide")}, 
+      React.createElement("div", {id: "mobile-panel-content", className: "panel-body " + (this.state.isShow ? "" : "hide")}, 
         React.createElement("div", {className: "list-group"}, 
           listButtons
         )
@@ -214,15 +178,16 @@ var TagList = React.createClass({displayName: "TagList",
   render: function() {
     var tagElements = [];
 
-    for (var i in this.props.tagNames)
+    for (var i in this.props.tagNames) {
       tagElements.push(
         React.createElement(TagButton, {
           name: this.props.tagNames[i], 
-          state: this.props.tags.indexOf(+i) !== -1, 
+          state: this.props.activeTag === +i, 
           index: i, 
           changeTagsFunction: this.props.changeTagsFunction, 
           count: this.props.tagNum[i]})
       );
+    }
 
     return (React.createElement("div", {id: "side-buttons"}, 
         React.createElement("h5", null, "Темы:"), 
@@ -245,45 +210,61 @@ var TagButton = React.createClass({displayName: "TagButton",
 });
 
 var Stories = React.createClass({displayName: "Stories",
-  render: function() {
-    var self = this;
-    var storyElements = this.props.stories.map(function(v) {
-      return React.createElement(Story, {
-        id: v.id, 
-        header: v.header, 
-        tags: v.tags, 
-        tagNames: self.props.tagNames, 
-        text: v.text, 
-        changeTagsFunction: self.props.changeTagsFunction})
+  getInitialState: function() {
+    return {
+      func: this.props.changeTagsFunction,
+    };
+  },
+
+  componentWillReceiveProps: function (nextProps) {
+    this.setState({
+      func: nextProps.changeTagsFunction,
     });
 
-    return React.createElement("div", {id: "stories-container", ref: "storiesContainer", className: "col-lg-12 col-md-12 col-sm-12 col-xs-12"}, storyElements);
-  }
-});
+    console.log('new props is: ', nextProps);
+  },
 
-var Story = React.createClass({displayName: "Story",
   render: function() {
-    var self = this;
+    var func = this.state.func;
 
-    var tags = this.props.tags.map(function(v) {
-      return React.createElement("a", {href: "javascript:", className: "text-muted story-tag-link", onClick: self.props.changeTagsFunction.bind(null, +v)}, " ", '#' + self.props.tagNames[+v], " ")
+    var storyElements = this.props.stories.slice().map(function(v,i) {
+      /*return <Story
+        id={v.id}
+        header={v.header}
+        tags={v.tags}
+        tagNames={this.props.tagNames}
+        text={v.text}
+        changeTagsFunction={this.props.changeTagsFunction} />*/
+        return React.createElement("a", {href: "javascript:", className: "text-muted story-tag-link", onClick: func.bind(null, +i)}, " ", '#123', " ")
     });
 
-    var parags;
-
-    return (
-      React.createElement("article", {name: 'post' + this.props.id}, 
-        React.createElement("h4", {className: "story-title"}, " ", this.props.header, " "), 
-
-        React.createElement("div", {className: "story-tags-area"}, 
-          tags
-        ), 
-
-        this.props.text.split('\n').map(function(v){return React.createElement("p", null, " ", v, " ")})
-      )
+    return React.createElement("div", {id: "stories-container", className: "col-lg-12 col-md-12 col-sm-12 col-xs-12"}, 
+      storyElements
     );
   }
 });
 
-// Export react class
+/*var Story = React.createClass({
+  render: function() {
+    console.log('new story render!');
+    console.log('change function is: ', this.props.changeTagsFunction);
+
+    var tags = this.props.tags.map(function(v) {
+      return <a href="javascript:" className="text-muted story-tag-link" onClick={this.props.changeTagsFunction.bind(null, +v)}> {'#' + this.props.tagNames[+v]} </a>
+    }.bind(this));
+
+    return (
+      <article name={'post' + this.props.id}>
+        <h4 className='story-title' > {this.props.header} </h4>
+
+        <div className="story-tags-area">
+          {tags}
+        </div>
+
+        {this.props.text.split('\n').map(function(v){return <p> {v} </p>})}
+      </article>
+    );
+  }
+});*/
+
 module.exports = Container;

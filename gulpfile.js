@@ -1,27 +1,28 @@
-var gulp = require('gulp'),
-  autopolyfiller = require('gulp-autopolyfiller'),
-  styl = require('gulp-stylus'),
+var autopolyfiller = require('gulp-autopolyfiller'),
+  gulp = require('gulp'),
+  webpack = require('gulp-webpack'),
+  gutil = require('gulp-util'),
   inline = require('rework-inline'),
   minifyCSS = require('gulp-minify-css'),
   nodemon = require('gulp-nodemon'),
   storyTransmitter = require('./server/lib/storyTransmitter'),
-  gutil = require('gulp-util'),
+  styl = require('gulp-stylus'),
   react = require('gulp-react'),
   uglify = require('gulp-uglify');
 
-gulp.task('default', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter'], function () {
+gulp.task('default', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
   nodemon({
-    script: 'index.js',
     execMap: {"js": "node --harmony"},
-    ext: 'html js css jade styl',
-    ignore: ['ignored.js'],
+    ext: 'html js css jade styl jsx',
+    ignore: ['server/reactComponents', 'client/js', 'client/css'],
+    script: 'index.js',
   })
-    .on('restart', function() {
+    .on('restart', ['convert:jsx', 'convert:css', 'webpack', 'minify:js'], function() {
       console.log('nodemon restarted!');
     });
 });
 
-gulp.task('start', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 'deamon:transmitter'], function () {
+gulp.task('start', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
@@ -31,7 +32,20 @@ gulp.task('start', ['convert:jsx', 'convert:css', 'minify:js', 'polifill:js', 'd
 gulp.task('convert:jsx', function(cb) {
   gulp.src(['./compile/prerender/*.jsx'])
     .pipe(react({harmony: true}))
-    .pipe(gulp.dest('./server/reactComponents'));
+    .pipe(gulp.dest('./server/reactComponents'))
+    .pipe(gulp.dest('./client/js'));
+
+  cb();
+});
+
+gulp.task('webpack', function(cb) {
+  gulp.src('./compile/js/webpack-init.js')
+    .pipe(webpack({
+      output: {
+        filename: 'bundle.js',
+      },
+    }))
+    .pipe(gulp.dest('./client/js'));
 
   cb();
 });
