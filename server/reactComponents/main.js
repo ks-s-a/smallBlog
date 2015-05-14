@@ -90,8 +90,6 @@ var Container = React.createClass({displayName: "Container",
 
   // Public function for component interaction
   changeTags: function(index) {
-    console.log('new tag is: ', index);
-
     this.setState({
         activeTag: this.state.activeTag === +index ? null : +index, // set or reset
         isEndReached: false,
@@ -108,8 +106,6 @@ var Container = React.createClass({displayName: "Container",
   },
 
   render: function () {
-    console.log('stories: ', this.state.stories);
-
     return (
       React.createElement("div", {id: "content"}, 
 
@@ -210,33 +206,18 @@ var TagButton = React.createClass({displayName: "TagButton",
 });
 
 var Stories = React.createClass({displayName: "Stories",
-  getInitialState: function() {
-    return {
-      func: this.props.changeTagsFunction,
-    };
-  },
-
-  componentWillReceiveProps: function (nextProps) {
-    this.setState({
-      func: nextProps.changeTagsFunction,
-    });
-
-    console.log('new props is: ', nextProps);
-  },
-
   render: function() {
-    var func = this.state.func;
+    var storyElements = this.props.stories.map(function(v,i) {
 
-    var storyElements = this.props.stories.slice().map(function(v,i) {
-      /*return <Story
-        id={v.id}
-        header={v.header}
-        tags={v.tags}
-        tagNames={this.props.tagNames}
-        text={v.text}
-        changeTagsFunction={this.props.changeTagsFunction} />*/
-        return React.createElement("a", {href: "javascript:", className: "text-muted story-tag-link", onClick: func.bind(null, +i)}, " ", '#123', " ")
-    });
+      return React.createElement(Story, {
+        id: v.id, 
+        header: v.header, 
+        tags: v.tags, 
+        tagNames: this.props.tagNames, 
+        text: v.text, 
+        changeTagsFunction: this.props.changeTagsFunction})
+
+    }.bind(this));
 
     return React.createElement("div", {id: "stories-container", className: "col-lg-12 col-md-12 col-sm-12 col-xs-12"}, 
       storyElements
@@ -244,27 +225,33 @@ var Stories = React.createClass({displayName: "Stories",
   }
 });
 
-/*var Story = React.createClass({
-  render: function() {
-    console.log('new story render!');
-    console.log('change function is: ', this.props.changeTagsFunction);
+var Story = React.createClass({displayName: "Story",
+  _createParagraphs: function(text) {
+    return text.split('\n')
+      .map(function(v) {
+        return (React.createElement("p", null, " ", v, " "));
+      });
+  },
 
+  render: function() {
     var tags = this.props.tags.map(function(v) {
-      return <a href="javascript:" className="text-muted story-tag-link" onClick={this.props.changeTagsFunction.bind(null, +v)}> {'#' + this.props.tagNames[+v]} </a>
+      return React.createElement("a", {href: "javascript:", className: "text-muted story-tag-link", onClick: this.props.changeTagsFunction.bind(null, +v)}, " ", '#' + this.props.tagNames[+v], " ")
     }.bind(this));
 
+    var text = this._createParagraphs(this.props.text);
+
     return (
-      <article name={'post' + this.props.id}>
-        <h4 className='story-title' > {this.props.header} </h4>
+      React.createElement("article", {name: 'post' + this.props.id}, 
+        React.createElement("h4", {className: "story-title"}, " ", this.props.header, " "), 
 
-        <div className="story-tags-area">
-          {tags}
-        </div>
+        React.createElement("div", {className: "story-tags-area"}, 
+          tags
+        ), 
 
-        {this.props.text.split('\n').map(function(v){return <p> {v} </p>})}
-      </article>
+        text
+      )
     );
   }
-});*/
+});
 
 module.exports = Container;

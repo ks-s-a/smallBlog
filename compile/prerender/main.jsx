@@ -90,8 +90,6 @@ var Container = React.createClass({
 
   // Public function for component interaction
   changeTags: function(index) {
-    console.log('new tag is: ', index);
-
     this.setState({
         activeTag: this.state.activeTag === +index ? null : +index, // set or reset
         isEndReached: false,
@@ -108,8 +106,6 @@ var Container = React.createClass({
   },
 
   render: function () {
-    console.log('stories: ', this.state.stories);
-
     return (
       <div id="content" >
 
@@ -210,48 +206,39 @@ var TagButton = React.createClass({
 });
 
 var Stories = React.createClass({
-  getInitialState: function() {
-    return {
-      func: this.props.changeTagsFunction,
-    };
-  },
-
-  componentWillReceiveProps: function (nextProps) {
-    this.setState({
-      func: nextProps.changeTagsFunction,
-    });
-
-    console.log('new props is: ', nextProps);
-  },
-
   render: function() {
-    var func = this.state.func;
+    var storyElements = this.props.stories.map(function(v,i) {
 
-    var storyElements = this.props.stories.slice().map(function(v,i) {
-      /*return <Story
+      return <Story
         id={v.id}
         header={v.header}
         tags={v.tags}
         tagNames={this.props.tagNames}
         text={v.text}
-        changeTagsFunction={this.props.changeTagsFunction} />*/
-        return <a href="javascript:" className="text-muted story-tag-link" onClick={func.bind(null, +i)}> {'#123'} </a>
-    });
+        changeTagsFunction={this.props.changeTagsFunction} />
 
-    return <div id="stories-container" className="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    }.bind(this));
+
+    return <div id="stories-container" className="col-lg-12 col-md-12 col-sm-12 col-xs-12" >
       {storyElements}
     </div>;
   }
 });
 
-/*var Story = React.createClass({
-  render: function() {
-    console.log('new story render!');
-    console.log('change function is: ', this.props.changeTagsFunction);
+var Story = React.createClass({
+  _createParagraphs: function(text) {
+    return text.split('\n')
+      .map(function(v) {
+        return (<p> {v} </p>);
+      });
+  },
 
+  render: function() {
     var tags = this.props.tags.map(function(v) {
       return <a href="javascript:" className="text-muted story-tag-link" onClick={this.props.changeTagsFunction.bind(null, +v)}> {'#' + this.props.tagNames[+v]} </a>
     }.bind(this));
+
+    var text = this._createParagraphs(this.props.text);
 
     return (
       <article name={'post' + this.props.id}>
@@ -261,10 +248,10 @@ var Stories = React.createClass({
           {tags}
         </div>
 
-        {this.props.text.split('\n').map(function(v){return <p> {v} </p>})}
+        {text}
       </article>
     );
   }
-});*/
+});
 
 module.exports = Container;

@@ -10,7 +10,7 @@ var autopolyfiller = require('gulp-autopolyfiller'),
   react = require('gulp-react'),
   uglify = require('gulp-uglify');
 
-gulp.task('default', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
+gulp.task('development', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
   nodemon({
     execMap: {"js": "node --harmony"},
     ext: 'html js css jade styl jsx',
@@ -22,7 +22,7 @@ gulp.task('default', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'dea
     });
 });
 
-gulp.task('start', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
+gulp.task('production', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
@@ -82,7 +82,7 @@ gulp.task('polifill:js', function(cb) {
 gulp.task('deamon:transmitter', function(cb) {
 
   console.log('deamon:transmitter started!');
-  setInterval(storyTransmitter, 10800000);
+  setInterval(storyTransmitter, 22 * 30 * 60 * 1000); // 22.5 hours
 
   cb();
 });
