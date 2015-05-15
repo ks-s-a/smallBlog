@@ -55,7 +55,7 @@ var Story = React.createClass({
 
     // Create void object for tag choose
     var voidTagObject = {};
-    for (var i in TAG_NAMES) {
+    for (var i in tagNames) {
       voidTagObject[i] = false;
     }
 
@@ -75,8 +75,8 @@ var Story = React.createClass({
   _storyAction: function(action) {
     var self = this;
 
-    var title = this.refs.title.getDOMNode().querySelector('input').value;
-    var text = this.refs.text.getDOMNode().querySelector('textarea').value;
+    var title = document.querySelector('.story-title').value;
+    var text = document.querySelector('.story-text').value;
 
     var paramString =
       'storyId=' + this.props.id +
@@ -104,11 +104,9 @@ var Story = React.createClass({
   },
 
   render: function() {
-    console.log('i\'m render, sir! : ', this.state.choosenTags);
-
     var tags = [];
 
-    for (var tag in TAG_NAMES) {
+    for (var tag in tagNames) {
       tags.push(
         <Button
           bsStyle={this.state.choosenTags[tag] ? 'primary' : 'default'}
@@ -116,15 +114,15 @@ var Story = React.createClass({
           className="tag-button"
           onClick={this._chooseTag.bind(this, tag)}>
 
-          {TAG_NAMES[tag]}
+          {tagNames[tag]}
         </Button>);
     }
 
     return (
     <div className="story-container">
       <form>
-        <Input ref="title" type="text" label='Заголовок:' defaultValue={this.props.header} />
-        <Input ref="text" type="textarea" rows="20" label='История:' defaultValue={this.props.text} />
+        <Input className="story-title" type="text" label='Заголовок:' defaultValue={this.props.header} />
+        <Input className="story-text" type="textarea" rows="20" label='История:' defaultValue={this.props.text} />
         <ButtonToolbar className="tag-buttons" >
           {tags}
         </ButtonToolbar>

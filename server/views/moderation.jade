@@ -14,4 +14,8 @@ body
 
 include ./scripts.jade
 
+script!= "var tagNames = " + (data.tagNames)  + ";"
+
+script(src="/bower_components/react/react.min.js")
+script(src="/bower_components/react-bootstrap/react-bootstrap.min.js")
 script(src="/js/moderationComponents.js")

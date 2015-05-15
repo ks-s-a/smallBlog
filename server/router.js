@@ -3,7 +3,8 @@ const app = require('./app'),
   jade = require('jade'),
   React = require('react'),
   request = require('co-request'),
-  routerLib = require('./lib/routerLib');
+  routerLib = require('./lib/routerLib'),
+  tagNames = require('./reactComponents/config.js');
 
 app
   .get('/getStoriesNumber', function *() {
@@ -32,7 +33,14 @@ app
   .get('/moderation', function *() {
 
     var compile = jade.compileFile('./server/views/moderation.jade');
-    this.body = compile();
+
+    var compileData = {
+      data: {
+        tagNames: JSON.stringify(tagNames),
+      }
+    };
+
+    this.body = compile(compileData);
   })
 
   .post('/moderateStory', function *() {
@@ -71,13 +79,14 @@ app
 
     var reactElement = React.createElement( require('./reactComponents/main.js'), {
       stories: lastTenStories,
-      tagNames: require('./reactComponents/config.js'),
+      tagNames: tagNames,
       tagNum: storiesMap,
     } );
 
     var compileDataObj = {
       data: {
         init: JSON.stringify({
+          tagNames: tagNames,
           tagNum: storiesMap,
           stories:  lastTenStories,
         }),

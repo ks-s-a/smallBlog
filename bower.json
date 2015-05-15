@@ -16,6 +16,8 @@
   ],
   "dependencies": {
     "react-bootstrap": "",
-    "react": ""
+    "react": "",
+    "classlist": "~2014.7.23",
+    "Respond": "~1.4.2"
   }
 }

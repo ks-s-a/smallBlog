@@ -42,9 +42,7 @@ body
       img(src="//top-fwz1.mail.ru/counter?id=2638302;js=na", style="border:0;", height="1", width="1", alt="Рейтинг@Mail.ru")
   //-- //Rating@Mail.ru counter --
 
-
-  script!= "var INITIAL_STATE = " + data.init + ";"
 include ./scripts.jade
 
-script(src="js/bundle.js")
-//-script(src="/js/main.js")
+script!= "var INITIAL_STATE = " + data.init + ";"
+script(src="/js/bundle.js")

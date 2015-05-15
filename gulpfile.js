@@ -39,11 +39,11 @@ gulp.task('convert:jsx', function(cb) {
 });
 
 gulp.task('webpack', function(cb) {
-  gulp.src('./compile/js/webpack-init.js')
+  gulp.src('webpack-init.js')
     .pipe(webpack({
       output: {
         filename: 'bundle.js',
-      },
+      }
     }))
     .pipe(gulp.dest('./client/js'));
 
