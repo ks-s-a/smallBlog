@@ -66,11 +66,10 @@ function* lastStoryId() {
   return yield db.Article.max('id');
 }
 
-function* articlesGetter(tags, lastStory) {
-
-  var lastStoryObj = lastStory ? {
+function* articlesGetter(tags, lastStoryId) {
+  var lastStoryObj = lastStoryId ? {
     id: {
-      $lt: +lastStory,
+      $lt: +lastStoryId,
     },
   } : {};
 
@@ -83,18 +82,19 @@ function* articlesGetter(tags, lastStory) {
   }).then(function(rows) {
 
     return rows.map(function(v) {
-    var tags = [];
+      var tags = [];
 
-    for (var tag in tagMap) {
-      if (v.dataValues[ tagMap[tag] ]) tags.push(tag);
-    }
+      for (var tag in tagMap) {
+        if (v.dataValues[ tagMap[tag] ]) tags.push(tag);
+      }
 
-    return {
-      id: v.dataValues.id,
-      header: v.dataValues.header,
-      tags: tags,
-      text: v.dataValues.text,
-    }})
+      return {
+        id: v.dataValues.id,
+        header: v.dataValues.header,
+        tags: tags,
+        text: v.dataValues.text,
+      }
+    });
   });
 }
 

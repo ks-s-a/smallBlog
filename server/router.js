@@ -6,6 +6,17 @@ const app = require('./app'),
   routerLib = require('./lib/routerLib'),
   tagNames = require('./reactComponents/config.js');
 
+// cashing object with a structure:
+// {
+//   name: {
+//     parametersValue: {
+//       value: cash,
+//       time: timestamp,
+//     }
+//   }
+// }
+const cash = {};
+
 app
   .get('/getStoriesNumber', function *() {
     var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
@@ -66,24 +77,35 @@ app
   .get('/', function *() {
     var from = +this.query.from || null;
 
-    const storyLastId = yield routerLib.lastStoryId();
-    const lastTenStories = yield routerLib.articlesGetter(null, from);
-    const storiesMap = yield routerLib.getArticlesNumber();
+    // Cash for 1 hour
+    if (cash && cash[ from + '' ] && cash[ from + '' ].time && cash[ from + '' ].time + 60 * 60 * 1000 > Date.now()) {
+      return this.body = cash[ from + '' ].value;
+    }
 
-    var prevLink = from && (from + 10) < storyLastId ?
+    const extractData = yield [
+      routerLib.lastStoryId(),
+      routerLib.articlesGetter(null, from),
+      routerLib.getArticlesNumber()
+    ];
+
+    const storyLastId = extractData[0];
+    const lastTenStories = extractData[1];
+    const storiesMap = extractData[2];
+
+    const prevLink = from && (from + 10) < storyLastId ?
       '/?from=' + (from + 10) :
       (from + 10) === storyLastId ? '/' : false;
-    var nextLink = from ?
+    const nextLink = from ?
       from > 10 ? '/?from=' + (from - 10) : false :
       storyLastId > 10 ? '/?from=' + (storyLastId - 10) : false;
 
-    var reactElement = React.createElement( require('./reactComponents/main.js'), {
+    const reactElement = React.createElement( require('./reactComponents/main.js'), {
       stories: lastTenStories,
       tagNames: tagNames,
       tagNum: storiesMap,
     } );
 
-    var compileDataObj = {
+    const compileDataObj = {
       data: {
         init: JSON.stringify({
           tagNames: tagNames,
@@ -96,8 +118,15 @@ app
       },
     };
 
-    var compile = jade.compileFile('./server/views/index.jade');
-    this.body = compile(compileDataObj);
+    const compile = jade.compileFile('./server/views/index.jade');
+    const result = compile(compileDataObj);
+
+    cash[ from + '' ] = {
+      value: result,
+      time: Date.now(),
+    };
+
+    this.body = result;
   })
 
   .post('/createStory', function *() {
