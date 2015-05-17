@@ -117,7 +117,8 @@ var Container = React.createClass({
         <MobileList tagNames={this.props.tagNames} tag={this.state.activeTag} tagNum={this.props.tagNum} changeTagsFunction={this.changeTags} />
 
         <div id="heading" className="col-lg-9 col-md-9 col-sm-12 col-xs-12">
-          <h1 id="main-header">Истории с чувством!</h1>
+          <h1 id="main-header">История любви. Мы чувствуем!</h1>
+          <h2 id="second-header">Реальные истории любви</h2>
           <Stories stories={this.state.stories} tagNames={this.props.tagNames} changeTagsFunction={this.changeTags} />
         </div>
       </div>

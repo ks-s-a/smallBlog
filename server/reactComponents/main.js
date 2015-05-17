@@ -117,7 +117,8 @@ var Container = React.createClass({displayName: "Container",
         React.createElement(MobileList, {tagNames: this.props.tagNames, tag: this.state.activeTag, tagNum: this.props.tagNum, changeTagsFunction: this.changeTags}), 
 
         React.createElement("div", {id: "heading", className: "col-lg-9 col-md-9 col-sm-12 col-xs-12"}, 
-          React.createElement("h1", {id: "main-header"}, "Истории с чувством!"), 
+          React.createElement("h1", {id: "main-header"}, "История любви. Мы чувствуем!"), 
+          React.createElement("h2", {id: "second-header"}, "Реальные истории любви"), 
           React.createElement(Stories, {stories: this.state.stories, tagNames: this.props.tagNames, changeTagsFunction: this.changeTags})
         )
       )
