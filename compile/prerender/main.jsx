@@ -119,6 +119,9 @@ var Container = React.createClass({
         <div id="heading" className="col-lg-9 col-md-9 col-sm-12 col-xs-12">
           <h1 id="main-header">История любви. Мы чувствуем!</h1>
           <h2 id="second-header">Реальные истории любви</h2>
+
+          <div className="addthis_sharing_toolbox text-right" />
+
           <Stories stories={this.state.stories} tagNames={this.props.tagNames} changeTagsFunction={this.changeTags} />
         </div>
       </div>
