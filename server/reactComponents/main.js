@@ -17,7 +17,7 @@ var Container = React.createClass({displayName: "Container",
       storyLastQueryTime: null,
       stories: this.props.stories || [],
       isEndReached: false,
-      lastStoryId: null,
+      lastStoryId: this.props.stories ? this.props.stories[this.props.stories.length - 1].id : null,
     };
   },
 
@@ -41,7 +41,8 @@ var Container = React.createClass({displayName: "Container",
 
         // If no more stories
         if (!newStoriesArr.length) {
-          console.log('No more stories!')
+          console.info('No more stories!');
+
           return self.setState({
             isEndReached: true,
           });
@@ -120,8 +121,6 @@ var Container = React.createClass({displayName: "Container",
           React.createElement("h1", {id: "main-header"}, "История любви. Мы чувствуем!"), 
           React.createElement("h2", {id: "second-header"}, "Реальные истории любви"), 
 
-          React.createElement("div", {className: "addthis_sharing_toolbox"}), 
-
           React.createElement(Stories, {stories: this.state.stories, tagNames: this.props.tagNames, changeTagsFunction: this.changeTags})
         )
       )
@@ -146,6 +145,7 @@ var MobileList = React.createClass({displayName: "MobileList",
     for (var i in this.props.tagNames)
       listButtons.push(
         React.createElement(MobileListButton, {
+          key: 'mobile-tag-' + i, 
           name: this.props.tagNames[i], 
           state: this.props.tag === +i, 
           index: i, 
@@ -181,6 +181,7 @@ var TagList = React.createClass({displayName: "TagList",
     for (var i in this.props.tagNames) {
       tagElements.push(
         React.createElement(TagButton, {
+          key: 'tag-' + i, 
           name: this.props.tagNames[i], 
           state: this.props.activeTag === +i, 
           index: i, 
@@ -214,6 +215,7 @@ var Stories = React.createClass({displayName: "Stories",
     var storyElements = this.props.stories.map(function(v,i) {
 
       return React.createElement(Story, {
+        key: 'story-' + i, 
         id: v.id, 
         header: v.header, 
         tags: v.tags, 
@@ -232,14 +234,25 @@ var Stories = React.createClass({displayName: "Stories",
 var Story = React.createClass({displayName: "Story",
   _createParagraphs: function(text) {
     return text.split('\n')
-      .map(function(v) {
-        return (React.createElement("p", null, " ", v, " "));
+      .map(function(v, i) {
+        return (React.createElement("p", {
+          key: 'p-num-' + i}, 
+
+          v
+        ));
       });
   },
 
   render: function() {
-    var tags = this.props.tags.map(function(v) {
-      return React.createElement("a", {href: "javascript:", className: "text-muted story-tag-link", onClick: this.props.changeTagsFunction.bind(null, +v)}, " ", '#' + this.props.tagNames[+v], " ")
+    var tags = this.props.tags.map(function(v, i) {
+      return (React.createElement("a", {
+        key: 'story-tag-' + i, 
+        href: "javascript:", 
+        className: "text-muted story-tag-link", 
+        onClick: this.props.changeTagsFunction.bind(null, +v)}, 
+
+        '#' + this.props.tagNames[+v]
+      ));
     }.bind(this));
 
     var text = this._createParagraphs(this.props.text);

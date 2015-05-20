@@ -17,7 +17,7 @@ var Container = React.createClass({
       storyLastQueryTime: null,
       stories: this.props.stories || [],
       isEndReached: false,
-      lastStoryId: null,
+      lastStoryId: this.props.stories ? this.props.stories[this.props.stories.length - 1].id : null,
     };
   },
 
@@ -41,7 +41,8 @@ var Container = React.createClass({
 
         // If no more stories
         if (!newStoriesArr.length) {
-          console.log('No more stories!')
+          console.info('No more stories!');
+
           return self.setState({
             isEndReached: true,
           });
@@ -120,8 +121,6 @@ var Container = React.createClass({
           <h1 id="main-header">История любви. Мы чувствуем!</h1>
           <h2 id="second-header">Реальные истории любви</h2>
 
-          <div className="addthis_sharing_toolbox text-right" />
-
           <Stories stories={this.state.stories} tagNames={this.props.tagNames} changeTagsFunction={this.changeTags} />
         </div>
       </div>
@@ -146,6 +145,7 @@ var MobileList = React.createClass({
     for (var i in this.props.tagNames)
       listButtons.push(
         <MobileListButton
+          key={'mobile-tag-' + i}
           name={this.props.tagNames[i]}
           state={this.props.tag === +i}
           index={i}
@@ -181,6 +181,7 @@ var TagList = React.createClass({
     for (var i in this.props.tagNames) {
       tagElements.push(
         <TagButton
+          key={'tag-' + i}
           name={this.props.tagNames[i]}
           state={this.props.activeTag === +i}
           index={i}
@@ -214,6 +215,7 @@ var Stories = React.createClass({
     var storyElements = this.props.stories.map(function(v,i) {
 
       return <Story
+        key={'story-' + i}
         id={v.id}
         header={v.header}
         tags={v.tags}
@@ -232,14 +234,25 @@ var Stories = React.createClass({
 var Story = React.createClass({
   _createParagraphs: function(text) {
     return text.split('\n')
-      .map(function(v) {
-        return (<p> {v} </p>);
+      .map(function(v, i) {
+        return (<p
+          key={'p-num-' + i}>
+
+          {v}
+        </p>);
       });
   },
 
   render: function() {
-    var tags = this.props.tags.map(function(v) {
-      return <a href="javascript:" className="text-muted story-tag-link" onClick={this.props.changeTagsFunction.bind(null, +v)}> {'#' + this.props.tagNames[+v]} </a>
+    var tags = this.props.tags.map(function(v, i) {
+      return (<a
+        key={'story-tag-' + i}
+        href="javascript:"
+        className="text-muted story-tag-link"
+        onClick={this.props.changeTagsFunction.bind(null, +v)}>
+
+        {'#' + this.props.tagNames[+v]}
+      </a>);
     }.bind(this));
 
     var text = this._createParagraphs(this.props.text);

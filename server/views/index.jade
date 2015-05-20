@@ -44,8 +44,10 @@ body
 
 include ./scripts.jade
 
-// Go to www.addthis.com/dashboard to customize your tools
+//- Go to www.addthis.com/dashboard to customize your tools
+//-script(src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-555b2dde6ad4460d" async="async")
 script(src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-555b2dde6ad4460d" async="async")
+
 
 script!= "var INITIAL_STATE = " + data.init + ";"
 script(src="/js/bundle.js")
