@@ -2,7 +2,7 @@ const db = require('../db');
 
 module.exports = function () {
 
-  db.Sandbox.find({
+  const result = db.Sandbox.find({
     where: {
       status: 'approved'
     },
@@ -32,4 +32,6 @@ module.exports = function () {
     .catch(function(err) {
       console.log('error when transmiting : ', err);
     });
+
+  console.log('Story transmitted result : ', result);
 };
