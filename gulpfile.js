@@ -10,19 +10,19 @@ var autopolyfiller = require('gulp-autopolyfiller'),
   react = require('gulp-react'),
   uglify = require('gulp-uglify');
 
-gulp.task('development', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
+gulp.task('development', ['convert:jsx', 'convert:css', 'webpack', 'deamon:transmitter'], function () {
   nodemon({
     execMap: {"js": "node --harmony"},
     ext: 'html js css jade styl jsx',
     ignore: ['server/reactComponents', 'client/js', 'client/css'],
     script: 'index.js',
   })
-    .on('restart', ['convert:jsx', 'convert:css', 'webpack', 'minify:js'], function() {
+    .on('restart', ['convert:jsx', 'convert:css', 'webpack'], function() {
       console.log('nodemon restarted!');
     });
 });
 
-gulp.task('production', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', 'deamon:transmitter'], function () {
+gulp.task('production', ['convert:jsx', 'convert:css', 'webpack', 'deamon:transmitter'], function () {
   nodemon({
     script: 'index.js',
     execMap: {"js": "node --harmony"},
@@ -30,8 +30,9 @@ gulp.task('production', ['convert:jsx', 'convert:css', 'webpack', 'minify:js', '
 });
 
 gulp.task('convert:jsx', function(cb) {
-  gulp.src(['./compile/prerender/*.jsx'])
+  gulp.src(['./compile/js/*.jsx'])
     .pipe(react({harmony: true}))
+    .pipe(uglify().on('error', gutil.log))
     .pipe(gulp.dest('./server/reactComponents'))
     .pipe(gulp.dest('./client/js'));
 
@@ -43,7 +44,7 @@ gulp.task('webpack', function(cb) {
     .pipe(webpack({
       output: {
         filename: 'bundle.js',
-      }
+      },
     }))
     .pipe(gulp.dest('./client/js'));
 
@@ -61,10 +62,9 @@ gulp.task('convert:css', function(cb) {
   cb();
 });
 
-gulp.task('minify:js', function(cb) {
+gulp.task('uglify:js', function(cb) {
 
-  gulp.src(['./compile/js/*.jsx'])
-    .pipe(react({harmony: true}))
+  gulp.src(['./client/js/*.js'])
     .pipe(uglify().on('error', gutil.log))
     .pipe(gulp.dest('./client/js'));
 
@@ -74,6 +74,7 @@ gulp.task('minify:js', function(cb) {
 gulp.task('polifill:js', function(cb) {
   gulp.src(['./client/js/*.js'])
     .pipe(autopolyfiller('polifil.js'))
+    .pipe(uglify().on('error', gutil.log))
     .pipe(gulp.dest('./client/js'));
 
   cb();
