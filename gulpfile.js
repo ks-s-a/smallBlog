@@ -1,6 +1,6 @@
 var autopolyfiller = require('gulp-autopolyfiller'),
   gulp = require('gulp'),
-  webpack = require('gulp-webpack'),
+  gulpWebpack = require('gulp-webpack'),
   gutil = require('gulp-util'),
   inline = require('rework-inline'),
   minifyCSS = require('gulp-minify-css'),
@@ -8,6 +8,7 @@ var autopolyfiller = require('gulp-autopolyfiller'),
   storyTransmitter = require('./server/lib/storyTransmitter'),
   styl = require('gulp-stylus'),
   react = require('gulp-react'),
+  webpack = require('webpack'),
   uglify = require('gulp-uglify');
 
 gulp.task('development', ['convert:jsx', 'convert:css', 'webpack', 'deamon:transmitter'], function () {
@@ -41,11 +42,14 @@ gulp.task('convert:jsx', function(cb) {
 
 gulp.task('webpack', function(cb) {
   gulp.src('webpack-init.js')
-    .pipe(webpack({
+    .pipe(gulpWebpack({
       output: {
         filename: 'bundle.js',
       },
-    }))
+      plugins: [
+        new webpack.optimize.UglifyJsPlugin()
+      ],
+    }, webpack))
     .pipe(gulp.dest('./client/js'));
 
   cb();
@@ -62,14 +66,14 @@ gulp.task('convert:css', function(cb) {
   cb();
 });
 
-gulp.task('uglify:js', function(cb) {
+/*gulp.task('uglify:js', function(cb) {
 
   gulp.src(['./client/js/*.js'])
     .pipe(uglify().on('error', gutil.log))
     .pipe(gulp.dest('./client/js'));
 
   cb();
-});
+});*/
 
 gulp.task('polifill:js', function(cb) {
   gulp.src(['./client/js/*.js'])

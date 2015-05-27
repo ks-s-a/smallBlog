@@ -42,12 +42,11 @@ body
       img(src="//top-fwz1.mail.ru/counter?id=2638302;js=na", style="border:0;", height="1", width="1", alt="Рейтинг@Mail.ru")
   //-- //Rating@Mail.ru counter --
 
+script!= "var INITIAL_STATE = " + data.init + ";"
+
 include ./scripts.jade
 
+script(src="/js/bundle.js" async="async")
+
 //- Go to www.addthis.com/dashboard to customize your tools
-//-script(src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-555b2dde6ad4460d" async="async")
 script(src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-555b2dde6ad4460d" async="async")
-
-
-script!= "var INITIAL_STATE = " + data.init + ";"
-script(src="/js/bundle.js")
