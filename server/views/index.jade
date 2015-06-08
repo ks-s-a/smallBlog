@@ -21,7 +21,6 @@ head
 body
   include ./../../client/yandex.html
   include ./../../client/mail-counter.html
-  include ./../../client/rambler-counter.html
 
   div(class="col-lg-2 col-md-1 hidden-sm hidden-xs")
   div(class="col-lg-8 col-md-10 col-sm-12 col-xs-12")
@@ -29,6 +28,9 @@ body
     include ./navbar.jade
 
     div(id="content-container")!= data.html
+
+  div(style="display:none;")
+    include ./../../client/rambler-counter.html
 
 script!= "var INITIAL_STATE = " + data.init + ";"
 
