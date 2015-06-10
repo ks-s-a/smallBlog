@@ -2,3 +2,4 @@ User-agent: *
 Disallow: /myStory
 Crawl-delay: 4.5
 Host: lstory.org
+
