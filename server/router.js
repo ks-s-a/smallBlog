@@ -92,12 +92,12 @@ app
     const lastTenStories = extractData[1];
     const storiesMap = extractData[2];
 
-    const prevLink = from && (from + 10) < storyLastId ?
-      '/?from=' + (from + 10) :
-      (from + 10) === storyLastId ? '/' : false;
-    const nextLink = from ?
-      from > 10 ? '/?from=' + (from - 10) : false :
-      storyLastId > 10 ? '/?from=' + (storyLastId - 10) : false;
+    // const prevLink = from && (from + 10) < storyLastId ?
+    //   '/?from=' + (from + 10) :
+    //   (from + 10) === storyLastId ? '/' : false;
+    // const nextLink = from ?
+    //   from > 10 ? '/?from=' + (from - 10) : false :
+    //   storyLastId > 10 ? '/?from=' + (storyLastId - 10) : false;
 
     const reactElement = React.createElement( require('./reactComponents/main.js'), {
       stories: lastTenStories,
@@ -112,8 +112,8 @@ app
           tagNum: storiesMap,
           stories:  lastTenStories,
         }),
-        prevLink: prevLink,
-        nextLink: nextLink,
+        // prevLink: prevLink,
+        // nextLink: nextLink,
         html: React.renderToString( reactElement ),
       },
     };
