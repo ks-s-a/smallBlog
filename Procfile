@@ -1,1 +1,1 @@
-web: gulp production
+web: gulp development

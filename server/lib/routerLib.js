@@ -1,6 +1,9 @@
 const db = require('../db'),
   commonLib = require('./common'),
-  tagMap = require('../db/tagMap');
+  pagesSettings = require('./../config/pagesSettings'),
+  tagMap = require('../db/tagMap'),
+  update = require('./../../node_modules/react/lib/update'),
+  React = require('react');
 
 
 //--------------Sandbox----------------------------//
@@ -139,6 +142,23 @@ function* getArticlesNumber(tags) {
 
   return resultObject;
 }
+
+function* getPageContent(pagePath) {
+  const lastTenStories = yield articlesGetter(null);
+  const propsData = {
+    stories: lastTenStories,
+    storiesTheme: null,
+  };
+  const reactElement = React.createElement( require('./../reactComponents/main.js'), propsData );
+  const compileDataObj = {
+    data: update({
+      html: React.renderToString( reactElement ),
+      init: JSON.stringify(propsData),
+    }, {$merge: pagesSettings.main}),
+  };
+
+  return compileDataObj;
+}
 //-------------------------------------------------//
 
 module.exports.addArticleToSandbox = addArticleToSandbox;
@@ -147,5 +167,6 @@ module.exports.removeArticleFromSandbox = removeArticleFromSandbox;
 
 module.exports.articlesGetter = articlesGetter;
 module.exports.getArticlesForModeration = getArticlesForModeration;
+module.exports.getPageContent = getPageContent;
 module.exports.getArticlesNumber = getArticlesNumber;
 module.exports.lastStoryId = lastStoryId;

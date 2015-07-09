@@ -1,4 +1,6 @@
 User-agent: *
 Disallow: /myStory
-Crawl-delay: 4.5
+Disallow: /yandex.html
+Disallow: /google288a4db026bdb241.html
+Crawl-delay: 5
 Host: lstory.org
