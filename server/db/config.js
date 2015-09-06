@@ -12,39 +12,17 @@ if (process.env.NODE_ENV === 'production') {
       native: true
     },
   };
-}
-
-else if (process.env.NODE_ENV === 'development') {
+} else {
   module.exports = {
     isProduction: false,
 
     dialect: 'postgres',
     protocol: 'postgres',
 
-    database: 'neo',
+    database: 'sandbox',
     port: 5432,
     host: 'localhost',
-    username: 'neo',
-    password: '',
-
-    logging: false,
-    dialectOptions: {
-      native: true
-    },
-  };
-}
-
-else {
-  module.exports = {
-    isProduction: false,
-
-    dialect: 'postgres',
-    protocol: 'postgres',
-
-    database: 'neo',
-    port: 5432,
-    host: 'localhost',
-    username: 'neo',
+    username: 's.ksenofontov',
     password: '',
 
     logging: false,
