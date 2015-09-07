@@ -1,1 +1,1 @@
-web: gulp --harmony
+web: NODE_ENV="production" gulp --harmony

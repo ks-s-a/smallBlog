@@ -14,7 +14,7 @@ var Container = React.createClass({
       // Stories
       storyLastQueryTime: null,
       stories: this.props.stories || [],
-      isEndReached: false,
+      isEndReached: this.props.isEnd || false,
       lastStoryId: this.props.stories ? this.props.stories[this.props.stories.length - 1].id : null,
     };
   },
@@ -40,16 +40,18 @@ var Container = React.createClass({
       if (this.readyState != 4) return; // запрос ещё не завершён
 
       if (this.responseText) {
-        var newStoriesArr = JSON.parse(this.responseText);
+        var answer = JSON.parse(this.responseText);
 
         // If no more stories
-        if (!newStoriesArr || !newStoriesArr.length) {
+        if (!answer || !answer.stories || !answer.stories.length) {
           console.info('No more stories!');
 
           return self.setState({
             isEndReached: true,
           });
         }
+
+        var newStoriesArr = answer.stories;
 
         // Sort array by DESC
         var sortArr = newStoriesArr.sort(function(a, b) {
@@ -65,6 +67,7 @@ var Container = React.createClass({
         self.setState({
           lastStoryId: lastStoryId,
           stories: storiesArr,
+          isEndReached: answer.isEnd,
         });
       }
     }

@@ -70,6 +70,7 @@ function* lastStoryId() {
 }
 
 function* articlesGetter(tag, lastStoryId) {
+  const storyPortion = 10;
   const queryObj = lastStoryId ? {
     id: {
       $lt: +lastStoryId,
@@ -80,14 +81,21 @@ function* articlesGetter(tag, lastStoryId) {
     queryObj[ tagMap[tag] ] = true;
 
   return yield db.Article.findAll({
-    limit: 10,
+    limit: storyPortion + 1, // +1 for end detection
     where: queryObj,
     order: [['id', 'DESC']],
   }).then(function(rows) {
+
     if (!rows.length)
       return null;
 
-    return rows.map(function(v) {
+    const isEnd = rows.length <= storyPortion;
+
+    if (!isEnd) {
+      rows.pop();
+    }
+
+    const stories = rows.map(function(v) {
       var tags = [];
 
       for (var tag in tagMap) {
@@ -99,8 +107,13 @@ function* articlesGetter(tag, lastStoryId) {
         header: v.header,
         tags: tags,
         text: v.text,
-      }
+      };
     });
+
+    return {
+      isEnd: isEnd,
+      stories: stories,
+    };
   });
 }
 
@@ -153,10 +166,12 @@ function* getPageContent(pagePath) {
     return false;
 
   const theme = settings.theme;
-  const lastTenStories = yield articlesGetter(theme);
+  const articlesObj = yield articlesGetter(theme);
+  const lastTenStories = articlesObj.stories;
   const propsData = {
     stories: lastTenStories,
     storiesTheme: theme,
+    isEnd: articlesObj.isEnd,
   };
 
   const reactElement = React.createElement( require('./../reactComponents/main.js'), propsData );
