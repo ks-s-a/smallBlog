@@ -39,6 +39,6 @@ Thumbs.db
 #own components
 node_modules
 bower_components
-client/css
-client/js
+client/css/*
+client/js/*
 .eslintrc
