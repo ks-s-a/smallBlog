@@ -61,13 +61,13 @@ module.exports = function createArticleModel(db) {
           header: 'Trulala',
           text: 'lkdsjfg lkjsdlkfgj lksdjfg kldskfgj sgjiotrej iw howj ggog sjtiogj joig soidjfg.',
           dateTag: true,
-          sexTag: false,
-          loveTag: false,
+          sexTag: true,
+          loveTag: true,
           workTag: true,
           merrageTag: true,
-          fantasyTag: false,
+          fantasyTag: true,
           moneyTag: true,
-          treasonTag: false,
+          treasonTag: true,
         });
 
         Article.create({

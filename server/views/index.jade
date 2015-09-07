@@ -26,17 +26,20 @@ body
         img(class="main-header__main-pic" src="#{data.mainImage.source}" alt="#{data.mainImage.alt}" title="#{data.mainImage.title}")
       div(class="col-lg-8 col-md-8 col-sm-8 col-xs-8 main-header__text-board")
         h1(class="main-header__header")= data.mainHeader
-        p(class="main-header__description")= data.mainDescription
+        p(class="main-header__description")
+          | &nbsp;&nbsp;&nbsp; #{data.mainDescription}
 
     nav(class="col-lg-3 col-md-3 col-sm-3 col-xs-3")
-      h3(class=)= 'Темы историй:'
+      h3(class=)= 'Темы:'
       ul(class="nav nav-pills nav-stacked aside-area__list")
         li
-          a(href="/1")= 'Грустные истории'
+          a(href="/intimnye-istorii")= 'Интимные истории'
         li
-          a(href="/2")= 'Интимные истории'
+          a(href="/istorija-o-ljubvi-podrostkov")= 'Первая любовь'
         li
-          a(href="/3")= 'Кавказские истории'
+          a(href="/istorii-ljubvi-na-rabote")= 'Любовь на работе'
+        li
+          a(href="/istorija-izmeny")= 'История измены'
 
     #content-container(class="col-lg-9 col-md-9 col-sm-9 col-xs-9 main-container")!= data.html
 

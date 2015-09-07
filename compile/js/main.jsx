@@ -43,7 +43,7 @@ var Container = React.createClass({
         var newStoriesArr = JSON.parse(this.responseText);
 
         // If no more stories
-        if (!newStoriesArr.length) {
+        if (!newStoriesArr || !newStoriesArr.length) {
           console.info('No more stories!');
 
           return self.setState({
@@ -100,7 +100,8 @@ var Container = React.createClass({
     return <Stories
       stories={this.state.stories}
       tagNames={this.props.tagNames}
-      changeTagsFunction={this.changeTags} />;
+      changeTagsFunction={this.changeTags}
+      needEndMessage={this.state.isEndReached} />;
   },
 });
 
@@ -125,8 +126,9 @@ var Stories = React.createClass({
           </p>);
       }, []);
 
-    return <div id="stories-container">
+    return <div id="stories-container" className="stories-container">
       {storyElements}
+      {this.props.needEndMessage ? <NoStoryMes /> : ''}
     </div>;
   }
 });
@@ -153,6 +155,14 @@ var Story = React.createClass({
       </div>
     </article>;
   }
+});
+
+var NoStoryMes = React.createClass({
+  render: function() {
+    return <div className="stories-container__end-message">
+      <p>Ну вот и всё! Самое время написать <a href="/myStory">свою историю</a>!</p>
+    </div>;
+  },
 });
 
 module.exports = Container;

@@ -17,7 +17,6 @@ const jadeTemplates = {
 };
 
 app
-
   // AJAX queries -v-
   .get('/getStoriesNumber', function *() {
     var tags = this.query.tags ? JSON.parse(this.query.tags) : null;
@@ -36,6 +35,18 @@ app
   })
 
   // Site pages -v-
+  .get('/', function *() {
+    // Cash for 1 hour
+    if ( cash.check('main', 1) )
+      return this.body = cash.get('main');
+
+    const compileDataObj = yield routerLib.getPageContent('/');
+    const result = jadeTemplates.main(compileDataObj);
+
+    cash.set('main', result);
+    return this.body = result;
+  })
+
   .get('/myStory', function *() {
     this.body = jadeTemplates.myStory();
   })
@@ -48,6 +59,25 @@ app
     };
 
     this.body = jadeTemplates.moderation(compileData);
+  })
+
+  .get('/:path', function* (next) {
+    const path = this.params.path;
+
+    // Cash for 1 hour
+    if ( cash.check(path, 1) )
+      return this.body = cash.get(path);
+
+    const compileDataObj = yield routerLib.getPageContent(path);
+
+    // Not described in settings page
+    if (!compileDataObj)
+      return yield next;
+
+    const result = jadeTemplates.main(compileDataObj);
+
+    cash.set(path, result);
+    return this.body = result;
   })
 
   .post('/moderateStory', function *() {
@@ -68,18 +98,6 @@ app
     }
 
     this.body = '';
-  })
-
-  .get('/', function *() {
-    // Cash for 1 hour
-    if ( cash.check('main', 1) )
-      return cash.get('main');
-
-    const compileDataObj = yield routerLib.getPageContent('main');
-    const result = jadeTemplates.main(compileDataObj);
-
-    cash.set('main', result);
-    this.body = result;
   })
 
   .post('/createStory', function *() {

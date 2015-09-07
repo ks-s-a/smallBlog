@@ -69,33 +69,36 @@ function* lastStoryId() {
   return yield db.Article.max('id');
 }
 
-function* articlesGetter(tags, lastStoryId) {
-  var lastStoryObj = lastStoryId ? {
+function* articlesGetter(tag, lastStoryId) {
+  const queryObj = lastStoryId ? {
     id: {
       $lt: +lastStoryId,
     },
   } : {};
 
-  var tagObjectForQuery = commonLib.margeObjects( commonLib.translateTagsToQueryObj(tags), lastStoryObj );
+  if (tag)
+    queryObj[ tagMap[tag] ] = true;
 
   return yield db.Article.findAll({
     limit: 10,
-    where: tagObjectForQuery,
+    where: queryObj,
     order: [['id', 'DESC']],
   }).then(function(rows) {
+    if (!rows.length)
+      return null;
 
     return rows.map(function(v) {
       var tags = [];
 
       for (var tag in tagMap) {
-        if (v.dataValues[ tagMap[tag] ]) tags.push(tag);
+        if (v[ tagMap[tag] ]) tags.push(tag);
       }
 
       return {
-        id: v.dataValues.id,
-        header: v.dataValues.header,
+        id: v.id,
+        header: v.header,
         tags: tags,
-        text: v.dataValues.text,
+        text: v.text,
       }
     });
   });
@@ -144,17 +147,25 @@ function* getArticlesNumber(tags) {
 }
 
 function* getPageContent(pagePath) {
-  const lastTenStories = yield articlesGetter(null);
+  const settings = pagesSettings[pagePath];
+
+  if (!settings)
+    return false;
+
+  const theme = settings.theme;
+  const lastTenStories = yield articlesGetter(theme);
   const propsData = {
     stories: lastTenStories,
-    storiesTheme: null,
+    storiesTheme: theme,
   };
+
   const reactElement = React.createElement( require('./../reactComponents/main.js'), propsData );
   const compileDataObj = {
     data: update({
       html: React.renderToString( reactElement ),
       init: JSON.stringify(propsData),
-    }, {$merge: pagesSettings.main}),
+      path: pagePath,
+    }, {$merge: settings}),
   };
 
   return compileDataObj;

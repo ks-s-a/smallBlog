@@ -15,7 +15,7 @@
 const store = {};
 
 function set(name, value) {
-  store.name = {
+  store[name] = {
     value: value,
     time: Date.now(),
   };
@@ -24,7 +24,7 @@ function set(name, value) {
 }
 
 function get(name) {
-  return store.name.value;
+  return store[name].value;
 }
 
 
@@ -32,8 +32,8 @@ function get(name) {
   Expired period will be in hours
 */
 function check(name, expiredPeriod) {
-  return store.name
-    && store.name.time + expiredPeriod * 60 * 60 * 1000 > Date.now();
+  return store[name]
+    && store[name].time + expiredPeriod * 60 * 60 * 1000 > Date.now();
 }
 
 function init() {

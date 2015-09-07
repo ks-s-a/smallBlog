@@ -7,7 +7,11 @@ div(class="navbar navbar-static-top navbar-default")
         img(class="brand-pic" src="/i/logo.png" alt="love story" title="Читать истории о любви")
 
     ul(class="nav navbar-nav")
-      if data.showMainAnchor
+      if data
+        unless data.path === "/"
+          li
+            a(href="/")='Главная'
+      else
         li
           a(href="/")='Главная'
 
