@@ -36,6 +36,13 @@ app
 
   // Site pages -v-
   .get('/', function *() {
+
+    // Temporary code for SE
+    if (this.request.query && this.request.query.from) {
+      this.response.status = 301;
+      return this.response.set('Location', 'http://lstory.org/');
+    }
+
     // Cash for 1 hour
     if ( cash.check('main', 1) )
       return this.body = cash.get('main');
